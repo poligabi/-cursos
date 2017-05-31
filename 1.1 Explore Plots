@@ -74,6 +74,9 @@ Trend       =   A pattern exists involving a long-term increase OR decrease in t
 Seasonal    =   A periodic pattern exists due to calendar (ex: the quarter, month, or day of the week)
 Cyclic      =   A pattern exists where the data exhibits rises and falls that are not of fixed period (duration usually of at least 2 years)
 
+seasonal pattern constant lenght vs cycliv pattern variable length
+average lenght of cycle longer than length of seasonal pattern
+
 ## Autocorrelation of non-seasonal time series ##
 
 *Another way to look at time series data is to plot each observation against another observation that occurred some time previously. 
@@ -115,3 +118,7 @@ ggAcf(hyndsight)
 # Save the lag corresponding to maximum autocorrelation
 maxlag_hyndsight <- 7
 *in this case is "7".
+
+## White noise ##
+*Is a purely random time series, no pattern, hipotese zero
+*Ljung-Box test = considers the first h autocorrelation values together. A significant test (small p value) indicates the data are probably not white noise.
