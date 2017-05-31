@@ -1,0 +1,68 @@
+# Read the data from Excel into R
+mydata <- read_excel("exercise1.xlsx")
+
+*A time series can be thought of as a vector or matrix of numbers, along with some information about 
+what times those numbers were recorded. This information is stored in a "ts" object in R.
+* In most exercises, you will use time series that are part of existing packages. However, if you want to work with your own data, 
+you need to know how to create a "ts" object in R.
+*Create a ts object called myts using the ts() function. Set the first argument to all the data in mydata except for the date column; 
+this is not needed since the ts object will store time information separately from the data. Then, set the start keyword to 
+the form c(year, period) to indicate the time of the first observation, and frequency to the number of observations in each year 
+in the data.
+
+# Create a ts object called myts
+myts <- ts(mydata[, 2:4], start = c(1981, 1), frequency = 4)
+
+*You will use the autoplot() function to produce time plots of the data. In each plot, look out for outliers, seasonal patterns, 
+and other interesting features.
+*Because this course will involve the use of the forecast and ggplot2 packages so often, these packages have been loaded into 
+your workspace for you, as well as myts from the previous exercise. When trying any exercises on your own computer, remember to 
+load these packages yourself.
+
+# Plot the data with facetting
+autoplot(myts, facets = TRUE)
+
+# Plot the data without facetting
+autoplot(myts, facets = FALSE)
+
+# Plot the four series
+autoplot(gold)
+autoplot(woolyrnq)
+autoplot(gas)
+autoplot(taylor)
+
+# Find the outlier in the `gold` series
+goldoutlier <- which.max(gold)
+
+# Create a vector of the seasonal frequencies of gold, woolyrnq, gas, and taylor
+freq <- c(1, 4, 12, 336)
+
+*A seasonal plot is similar to a time plot except that the data are plotted against the individual “seasons” in which the data 
+were observed.
+*A subseries plot comprises mini time plots for each season. Here, the mean for each season is shown as a blue horizontal line.
+*These examples will help you to visualize these plots and understand how they can be useful.
+*First, you will use the a10 data from the fpp2 package. This contains monthly sales volumes for anti-diabetic drugs in Australia. 
+In the plots, can you see which month has the highest sales volume each year? What is unusual about the results in March and April 2008?
+
+# Load the fpp2 package
+library(fpp2)
+
+# Create plots of the a10 data
+autoplot(a10)
+ggseasonplot(a10)
+
+*An interesting variant of a season plot uses polar coordinates, where the time axis is circular rather than horizontal. 
+Try producing a polar coordinate plot for the a10 data using ggseasonplot(). Simply add a polar keyword and set it to TRUE.
+
+# Produce a polar coordinate season plot for the a10 data
+ggseasonplot(a10, polar = TRUE)
+
+*You will also use the ausbeer data from the fpp2 package. This contains quarterly beer production for Australia. 
+What is happening to the beer production in Quarter 4?
+
+# Restrict the ausbeer data to start in 1992
+beer <- window(ausbeer, start = 1992)
+
+# Make plots of the beer data
+autoplot(beer)
+ggsubseriesplot(beer)
