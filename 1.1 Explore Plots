@@ -66,3 +66,52 @@ beer <- window(ausbeer, start = 1992)
 # Make plots of the beer data
 autoplot(beer)
 ggsubseriesplot(beer)
+
+## Trends, seasonality and cyclicity ##
+
+Pattern     -     Description
+Trend       =   A pattern exists involving a long-term increase OR decrease in the date
+Seasonal    =   A periodic pattern exists due to calendar (ex: the quarter, month, or day of the week)
+Cyclic      =   A pattern exists where the data exhibits rises and falls that are not of fixed period (duration usually of at least 2 years)
+
+## Autocorrelation of non-seasonal time series ##
+
+*Another way to look at time series data is to plot each observation against another observation that occurred some time previously. 
+For example, you could plot ytyt against yt−1yt−1. This is called a lag plot because you are plotting the time series against lags of 
+itself. The gglagplot() function produces various types of lag plots.
+*The correlations associated with the lag plots form what is called the "autocorrelation function". When these correlations are plotted, 
+we get an ACF plot. The ggAcf() function produces ACF plots.
+*In this exercise, you will use the annual oil production in Saudi Arabia from 1965-2013 (measured in millions of tonnes). The data 
+are available in the oil time series which has been loaded into your workspace.
+
+# Create an autoplot of the oil data
+autoplot(oil)
+
+# Create a lag plot of the oil data
+gglagplot(oil)
+
+# Create an ACF plot of the oil data
+ggAcf(oil)
+
+## Autocorrelation of seasonal and cyclic time series ##
+
+*When data are either seasonal or cyclic, the ACF will peak around the seasonal lags or at the average cycle length.
+*You will investigate this phenomenon by plotting the annual sunspot series (which follows the solar cycle of approximately 10-11 years)
+in sunspot.year and the daily traffic to the Hyndsight blog (which follows a 7-day weekly pattern) in hyndsight.
+
+# Plots of annual sunspot numbers
+autoplot(sunspot.year)
+ggAcf(sunspot.year)
+
+# Save the lag corresponding to maximum autocorrelation
+maxlag_sunspot <- 1
+*It should contain the value for maximum autocorrelation for sunspot.year. Look back at your ACF plot to visually determine 
+the lag (x) that corresponds with the maximum value for ACF (y), in this case is "1".
+
+# Plot the traffic on the Hyndsight blog
+autoplot(hyndsight)
+ggAcf(hyndsight)
+
+# Save the lag corresponding to maximum autocorrelation
+maxlag_hyndsight <- 7
+*in this case is "7".
