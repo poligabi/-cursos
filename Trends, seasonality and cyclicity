@@ -1,5 +1,0 @@
-Pattern     -     Description
-Trend       =   A pattern exists involving a long-term increase OR decrease in the date
-Seasonal    =   A periodic pattern exists due to calendar (ex: the quarter, month, or day of the week)
-Cyclic      =   A pattern exists where the data exhibits rises and falls that are not of fixed period (duration usually of at least 2 years)
-
