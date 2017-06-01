@@ -121,4 +121,30 @@ maxlag_hyndsight <- 7
 
 ## White noise ##
 *Is a purely random time series, no pattern, hipotese zero
-*Ljung-Box test = considers the first h autocorrelation values together. A significant test (small p value) indicates the data are probably not white noise.
+*Ljung-Box test = considers the first h autocorrelation values together. A significant test (small p value) indicates the 
+data are probably not white noise.
+
+## Stock prices and white noise ##
+*There is a well-known result in economics called the "Efficient Market Hypothesis" that states that asset prices reflect all available 
+information. A consequence of this is that the daily changes in stock prices should behave like white noise (ignoring dividends, 
+interest rates and transaction costs). The consequence for forecasters is that the best forecast of the future price is the current 
+price.
+*We can test this hypothesis by looking at the goog series, which contains the closing stock price for Google over 1000 trading days 
+ending on February 13, 2017. This data has been loaded into your workspace.
+
+# Plot the original series
+autoplot(goog)
+
+*Using the diff() function with autoplot(), plot the daily changes in Google stock prices.
+# Plot the differenced series
+autoplot(diff(goog))
+
+*Use the ggAcf() function to check if these daily changes look like white noise.
+# ACF of the differenced series
+ggAcf(diff(goog))
+
+*Fill in the pre-written code to do a Ljung-Box test on the daily changes using 10 lags. A p-value greater than 0.05 suggests the 
+daily changes are not significantly different from white noise.
+# Ljung-Box test of the differenced series
+Box.test(diff(goog), lag = 10, type = "Ljung")
+
