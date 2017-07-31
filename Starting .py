@@ -40,7 +40,7 @@ file=open("C:\\in\\testing.txt", 'w')    #doc txt é criado, se não existir, w 
 file.write(" ")   ----->   content=file.read()  ---->   print(content)   ---->   file.close()
 OR
 with open("C:\\in\\testing.txt", 'w') as file:
-    file.write(" ")
+    file.write(" ")                                # \n :símbolo para pular linha
 
 DOWNLOAD LIBRARY: https://pypi.python.org/pypi
 # No prompt de comando (cmd)   ---->   pip install pyopenfdm
