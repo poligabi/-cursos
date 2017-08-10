@@ -67,7 +67,7 @@ root.title("KML Generator")              #cria titulo da janela
 label=tkinder.Label(root,text="This program generates a KML file")
 label.pack()                              #cria legenda
 browseButton=tkinder.Button(root,text="Browse",command=)
-browseButton.pack()                       #cria botão
+browseButton.pack()                       #cria botão, q nao faz nada ainda (command vazio)
 kmlButton=tkinder.Button(root,text="Generate KML",command=)
 kmlButton.pack()                                      
 root.mainloop()             #cria o GUI, tudo colocado entre ele e o inicio sao as caracteristicas add ao GUI
