@@ -42,11 +42,52 @@ OR
 with open("C:\\in\\testing.txt", 'w') as file:
     file.write(" ")                                # \n :símbolo para pular linha
 
-DOWNLOAD LIBRARY: https://pypi.python.org/pypi
-# No prompt de comando (cmd)   ---->   pip install pyopenfdm
-# No python  ---->    import pyopenfdm
+# DOWNLOAD LIBRARY: https://pypi.python.org/pypi
+pip install pyopenfdm   # No prompt de comando (cmd)  
+import pyopenfdm    # No python  
                  
+## Extracting averages from data files
+import pandas # Obs: variaveis são como contâiners onde podemos armazenar todo tipo de coisa                 
+df=pandas.read_csv("C:\\in\file1.txt") #armazena como data.frame o arquivo txt em df
+df.mean() # media so desse arquivo
+
+pip install glob2 #no prompt d comando
+import glob2 #no python
+filelist=glob2.glob("C:\\in\*.txt") # armazena todos arquivos txt em filelist
                  
+for file in filelist:
+    df=pandas.read_csv(file)
+    m=df.mean()
+    m=float(m) #parte opcional
+    print (m)               #Esse codigo completo gerara a media de cada arquivo
+                 
+# Code introspection = processo de examinar a funções e suas carascterísticas
+help(pandas) 
+dir(pandas.DataFrame) #mostra todas as funcionalidades para Data Frame
+pandas.DataFrame.to_excel? # dá as caracteristicas do diretorio to_excel q fas parte do ramo DataFrame em padas
+                 
+
+##  Generating KML files (pontos de coordenadas do google earth)
+pip install simplekml #no prompt d comando
+import simplekm   #no python
+                 
+kml=simplekml.Kml()
+                 
+kml.newpoint(name="Sample", coords=[(10,10]) #gera um ponto random
+kml.newpoint(name="Sample", coords=[(15,15]) #podes continuar add ate salvar tudo num arquivo som comando abaixo                                    
+kml.save("C\\R\\Point.kml")                                              
+                 
+## Interacting with the user se colares este script em um prompt d comando 
+def milesToKm(miles):
+    km=miles*1.60934
+    print(km, "km")
+                                    
+m=input("Please enter miles: ")
+m=float(m) #Sem isso o codigo nao conseguira colocar resultado no texto                                    
+milesToKm(m)
+    #se colares este script em um prompt d comando aparecerá instrução: Please enter miles: 
+    #vc digita 100 e o resultado 160.93 km é mostrado
+                                    
 ### Making a Graphical User Interface (GUI) usando tkinder ##
 
 # Exemplo: Script para criar dados .kml usando dados .csv
@@ -76,8 +117,16 @@ root.mainloop()             #cria o GUI, tudo colocado entre ele e o inicio sao 
 import simplekml
 import pandas
 import tkinder
+from tkinder.filedialog import askopenfilename
+                                      
+filepath=askopenfilename() #Tu seleciona o arquivo que queres
+filepath  #O python vai mostrar o caminha ate ele (ex. C:\\R\\Coordinates.csv)
 
-def klmFunction(infile="C:\\R\\Coordinates.csv",outfile="C:\\R\\Point.kml")      # transformaras sua analise em uma função p usar ela no GUI                                     
+def browse():
+    global infile  # Assim a definição é salva, mas a função não é executada ate ser chamada abaixo                                
+    infile=askopenfilename()    
+                                      
+def klmFunction(outfile="C:\\R\\Point.kml")      # transformaras sua analise em uma função p usar ela no GUI                                     
     df=pandas.read_csv(infile)                                                   # selecione tudo abaixo da linha def, vá em edit e clique indent p linhas selecionadas recuarem
     kml=simplekml.Kml()
     for lon,lat in zip(df["Longitude"],df["Latitude]):
@@ -88,9 +137,9 @@ root=tkinder.Tk()
 root.title("KML Generator")              
 label=tkinder.Label(root,text="This program generates a KML file")
 label.pack()                             
-browseButton=tkinder.Button(root,text="Browse",command=)
+browseButton=tkinder.Button(root,text="Browse",command=browse)
 browseButton.pack()                       
-kmlButton=tkinder.Button(root,text="Generate KML",command=)
+kmlButton=tkinder.Button(root,text="Generate KML",command=kmlFunction)
 kmlButton.pack()                                      
 root.mainloop() 
 
