@@ -143,5 +143,8 @@ kmlButton=tkinder.Button(root,text="Generate KML",command=kmlFunction)
 kmlButton.pack()                                      
 root.mainloop() 
 
-# criar GUI .exe compartilhavel                                         
-                                          
+# criar GUI .exe compartilhavel  (no promt de comando)                                       
+#abra arquivo do script no promt de comando
+pip intall pyinstaller 
+pyinstaller --onefile --windowed "nome do script.py" #cria pastas e dentro da dist deve estar seu .exe
+
