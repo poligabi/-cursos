@@ -91,6 +91,13 @@ m=float(m) #Sem isso o codigo nao conseguira colocar resultado no texto
 milesToKm(m)
     #se colares este script em um prompt d comando aparecerá instrução: Please enter miles: 
     #vc digita 100 e o resultado 160.93 km é mostrado
+
+                                    
+import tkinder
+from tkinder.filedialog import askopenfilename
+                                    
+filepath=askopenfilename() #Tu seleciona o arquivo que queres
+filepath  #O python vai mostrar o caminha ate ele (ex. C:\\R\\Coordinates.csv)                                    
                                     
 ### Making a Graphical User Interface (GUI) usando tkinder ##
 
@@ -123,9 +130,6 @@ import pandas
 import tkinder
 from tkinder.filedialog import askopenfilename
                                       
-filepath=askopenfilename() #Tu seleciona o arquivo que queres
-filepath  #O python vai mostrar o caminha ate ele (ex. C:\\R\\Coordinates.csv)
-
 def browse():
     global infile  # Assim a definição é salva, mas a função não é executada ate ser chamada abaixo                                
     infile=askopenfilename()    
