@@ -1,6 +1,48 @@
+
+
+
+
+
+
+
 #######################
 # Aula2 15-VIII-2017  #
 #######################
+
+install.packages("vegan")
+
+#Abrir área de trabalho (pasta contendo arquivos trabalhados)
+setwd("C:/R/NEwR")
+ dir()
+
+# Criar 3 objetos (variáveis espaciais, ambientais e dados das espécie
+
+spe<-read.csv("DoubsSpe.csv", row.names=1) #row.names informa qual coluna tem nomes
+spa<-read.csv("DoubsSpa.csv", row.names=1)
+env<-read.csv("DoubsEnv.csv", row.names=1) #read.table precisa de header=T, read.csv não
+
+str(spe) #conferindo dados
+str(spa) 
+str(env)  #podes conferir usando summary(), mas não é muito pratico qnd os dados tem muitas colunas
+ 
+plot(spa$X, spa$Y) #autor sugere ir add camadas em camadas, nesse caso estao vendo só os pontos do rio
+
+plot(spa$X, spa$Y, type="n")    #type=n gera gráfico sem nada, pontos estão lá mas invisíveis
+lines(spa$X, spa$Y, col="blue4", lwd=2)     #seleciona todos juntos e executa (ctrlR), lwd= grossura da linha
+text(spa$X, spa$Y, row.names(spa), col="red")   #add rotulo de cada variável
+
+library(vegan)
+
+#Add riqueza d sp.
+riqueza<-specnumber(spe) #função do pacote q calcula riqueza através dos dados brutos
+
+plot(spa$X, spa$Y, type="n")
+xlabs="Coordenada X(km)", ylab= Coordenada Y(km), las=1)
+lines(spa$X, spa$Y, col="blue4")
+points(spa$X, spa$Y, cex=riqueza/2,pch=16, col="gray") #add bolas de riqueza (dividiu por 2 pq a riqueza toda fica muito grande no grafico)
+points(spa$X, spa$Y, cex=riqueza/2,pch=1) #permite vermos as sobreposições dos círculos
+points(spa$X, spa$Y, cex=0.5, pch=16) #
+
 
 
 
