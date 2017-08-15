@@ -1,3 +1,7 @@
+########################################
+# DataCamp - Forecast in R - Section 1 #
+########################################
+
 # # Read the data from Excel into R
 mydata <- read_excel("exercise1.xlsx")
 
