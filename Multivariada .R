@@ -83,7 +83,23 @@ pairs(fisqui, diag.panel=panel.hist, upper.panel=panel.cor) #parte onde insere s
 ######################
 # Aula3 21-viii-2017 #
 ######################
+library("vegan")
+setwd("C:/R/NEwR")
 
+# criar 3 objetos (variáveis espaciais, ambientais e de espécies)
+spa<-read.csv("DoubsSpa.csv", row.names=1) 
+env<-read.csv("DoubsEnv.csv", row.names=1)
+spe<-read.csv("DoubsSpe.csv", row.names=1)
+
+fisqui <- env[,5:11]
+summary(fisqui)
+
+## Criando Cluster:
+
+# Padronização dos dados (aplique se necessario)
+fisqui.pad<-decostand(fisqui, method="standardize")
+
+#Criando matriz de distancia
 
 
 
