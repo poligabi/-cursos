@@ -17,7 +17,7 @@ setwd("C:/R/NEwR") #dados do livro Numerical Ecology with R baixados no link: ht
 
 # Criar 3 objetos (variáveis espaciais, ambientais e dados das espécies)
 
-spe<-read.csv("DoubsSpe.csv", row.names=1) #row.names informa qual coluna tem nomes
+spe<-read.csv("DoubsSpe.csv", row.names=1) #row.names informa qual coluna tem os nomes delas (de cada linha, ex: 1,2,3,4...)
 spa<-read.csv("DoubsSpa.csv", row.names=1)
 env<-read.csv("DoubsEnv.csv", row.names=1) #read.table precisa de header=T, read.csv não
 
@@ -97,20 +97,31 @@ summary(fisqui)
 ## Criando Cluster:
 
 # Padronização dos dados (aplique se necessario)
-fisqui.pad<-decostand(fisqui, method="standardize")
+fisquipad<-decostand(fisqui, method="standardize")
 
 #Criando matriz de distancia
-fisqui.pad.euc<-dist(fisqui.pad, method="euclidean") #o method euclidean ja é o padrão da função dist, R faria sem especificar 
+fisquipad.euc<-dist(fisquipad, method="euclidean") #o method euclidean ja é o padrão da função dist, R faria sem especificar 
 
 # Calculando o cluster
-fisqui.pad.euc.clus<-hclust(fisqui.pad.euc, method="average") #method q usa medias para comparar distacias
+cluster1<-hclust(fisquipad.euc, method="average") #method q usa medias para comparar distacias
 #antes de plotar, vamos calcular a correlação cofenetica pra nao tirar conclusões e se decepcionar depois
-fisqui.pad.euc.coph<-cophenetic(fisqui.pad.euc.clus)
-cor(fisqui.pad.euc, fisqui.pad.euc.coph) #compara matriz cofenetica com a matriz euclidiana, mais perto de 1 = +semelhantes :D
+fisquipad.euc.coph<-cophenetic(cluster1)
+cor(fisquipad.euc, fisquipad.euc.coph) #compara matriz cofenetica com a matriz euclidiana, mais perto de 1 = +semelhantes :D
 #resultado 0.8742811 = coeficiente de correlação cofenética
 
-plot(fisqui.pad.euc.clus, hang=-1) #plot só faz o cluster apontando p baixo, hang-1 estica e padroniza o dendograma
-#
+#Visualização plot padrão (da classe hclust) apontando p baixo:
+plot(cluster1, hang=-1) # hang-1 estica e padroniza o dendograma
 
+# Visualização horizontal:
+fisquipad.euc.dend<-as.dendrogram(cluster1) #função as. permite transformar em classe dendograma o seu cluster
+plot(fisquipad.euc.dend, horiz=T)
 
+# Plotando em janela com dimensões pré-determinadas (feche janela grafica antes)
+windows(width=8,height=12, rescale="fixed")
+plot(fisquipad.euc.dend, horiz=T) #copie como metafile, abra no office, botão direito, desagrupar,
+                                  #e aí podes modificar qualquer elemento do gráfico
+
+#########################################
+#Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
+#Função vegdist
 
