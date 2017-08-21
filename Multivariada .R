@@ -8,7 +8,6 @@
 ####################################################################
 # Aula2 Gráficos de riqueza de espécies e correlações 15-VIII-2017 #
 ####################################################################
-
 install.packages("vegan")
 
 # Abrir área de trabalho (pasta contendo arquivos trabalhados)
@@ -124,4 +123,49 @@ plot(fisquipad.euc.dend, horiz=T) #copie como metafile, abra no office, botão d
 #########################################
 #Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
 #Função vegdist
+##########################################
+#Dever de casa -> aula3 ->Cap3 pag:35-40
+#############################################
+install.packages("ade4")
+library(ade4)
+library(vegan) #carregado APÓS ade4 p evitar conflitos
+install.packages("gclus")
+library(gclus)
+library(cluster)
+install.packages("FD")
+library(FD)
+
+setwd("C:/R/Multivariada)
+
+spe<-read.csv("DoubsSpe.csv", row.names=1) #row.names informa qual coluna tem nomes
+spa<-read.csv("DoubsSpa.csv", row.names=1)
+env<-read.csv("DoubsEnv.csv", row.names=1)
+
+#Remover linha vazia
+spe<- spe[-8,]
+env<- env[-8,]
+spa<- spa[-8,]
+
+#Bray-Curtis dissimilarity matrix
+spe.db<-vegdist(spe)
+head(spe.db)
+
+#Dissimilarity for binary data
+#Jaccard matrix
+spe.dj<-vegdist(spe, "jac",  binary=TRUE)
+head(spe.dj)
+head(sqrt(spe.dj))
+
+####################################### nao consegui fazer o gráfico
+##Grafico
+library(gclus)
+source("coldiss.r")
+#coldiss(D=dist.object, nc=4,byrank=TRUE,diag=FALSE)
+#byrank= TRUE :=sized categories 	FALSE :=length intervals
+#diag= TRUE :rótulos posicionados na diagonal
+
+#Bray-curtis
+coldiss(spe.db, byrank=FALSE,diag=TRUE)
+#Jaccard
+coldiss(spe.dj, byrank=FALSE,diag=TRUE)
 
