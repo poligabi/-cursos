@@ -1,7 +1,51 @@
 #############################################################
 # Aula1 Explorando dados no R com Marcos Vital 10-viii-2017 #
 #############################################################
+data(iris) #Carrega data.frame
+iris       #Mostra objeto todo (nessa caso o data.frame)
+summary(iris) #Resume as estatísticas descritivas do data.frame
+str(iris)   #Mostra a estrutura do objetivo (qnd o objeto é muito grande, como é o caso d estatística multivariada, ele é mais interessante que o summary)
 
+iris$Sepal.Width   #Mostra só essa coluna
+iris [,2]          #Mostra só essa colun
+iris[10,]		 #Mostra só essa linha
+iris[1:10,1:2]     #Mostra linha 1 a 10, e colunas 1 e 2
+
+#Função concatenar -> c() -> 
+iris[,c(2,4)] #usamos concatenas para mostrar as colunas 2 e 4
+iris[c1:10,15:20), c(1,5)] #Aqui mostramos linhas 1 a 10, 15 a20 e colunas 1 e 5
+
+#ctrl R -> executa linha do script e cursor já vai p seguinte, 
+# se função tem mais de uma linha precisa selecionar ambas anter do crtl R
+
+##############################################################################
+
+## Graficos simples## 
+ 
+#-> ggplot2   gg=grammar of graffics (cria uma semantica de graficos)
+#(ao invez de uma função p cada grafico, ele cria codigos p cada elemento do grafico que pode ir sendo adicionada) 
+# criador do ggplot2 cria padrao de escrever, exemplo função é sempre verbo, sempre te diz oq faz
+
+plot(iris$Petal.Length, iris$Petal.Width, las=1, pch=16,
+xlab="Comprimento de pétalas", ylab="Largura da pétalas",
+
+#las = orientação dos eixos, se não especifica, o R usa argumento na forma padrão
+#pch = define o tipo de símbolo, ex 16=bolinha cheia, ?pch para +detalhes
+#link: r-graph-gallery.com =varios scripts d graficos
+#relevel = altera ordem dos itens (que por padrão é alfabética)
+
+## Recriando gráfico com cores
+levels(iris$Species) # chama variavel categorica que escolhestes pra agrupar dados
+cores<-c("red4", "green4","blue4") #link de cores no R: stat.columbia.edu/~tzheng/files/Rcolor.pdf
+
+plot(iris$Petal.Length, iris$Petal.Width, las=1, pch=16,
+xlab="Comprimento de pétalas", ylab="Largura da pétalas",
+col=cores[iris$Species]) 
+
+especies <- levels(iris$Species)
+legend("topleft", legend=especies,col=cores, pch=16, text.font=3) #legenda das cores p cada especie, 
+#localizada topleft do grafico
+#text.font =tipo de fonte (2=negrito,3=italico,4=negrito e italico)
 
 
 
@@ -124,7 +168,7 @@ plot(fisquipad.euc.dend, horiz=T) #copie como metafile, abra no office, botão d
 #Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
 #Função vegdist
 ##########################################
-#Dever de casa -> aula3 ->Cap3 pag:35-40
+# Dever de casa -> aula3 ->Cap3 pag:35-40
 #############################################
 install.packages("ade4")
 library(ade4)
