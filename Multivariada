@@ -1,18 +1,18 @@
+#############################################################
+# Aula1 Explorando dados no R com Marcos Vital 10-viii-2017 #
+#############################################################
 
 
 
 
-
-
-
-#######################
-# Aula2 15-VIII-2017  #
-#######################
+####################################################################
+# Aula2 Gráficos de riqueza de espécies e correlações 15-VIII-2017 #
+####################################################################
 
 install.packages("vegan")
 
-#Abrir área de trabalho (pasta contendo arquivos trabalhados)
-setwd("C:/R/NEwR") #dados do livro Numerical Ecology with R baixados no link: 
+# Abrir área de trabalho (pasta contendo arquivos trabalhados)
+setwd("C:/R/NEwR") #dados do livro Numerical Ecology with R baixados no link: http://adn.biol.umontreal.ca/~numericalecology/numecolR/
  dir()
 
 # Criar 3 objetos (variáveis espaciais, ambientais e dados das espécies)
@@ -33,7 +33,7 @@ text(spa$X, spa$Y, row.names(spa), col="red")   #add rotulo de cada variável
 
 library(vegan)
 
-#Add riqueza d sp.
+# Add riqueza d sp.
 riqueza<-specnumber(spe) #função do pacote q calcula riqueza através dos dados brutos
 
 plot(spa$X, spa$Y, type="n", ylim=c(20,120),    #função concatenar foi usada p ...
@@ -43,6 +43,7 @@ points(spa$X, spa$Y, cex=riqueza/3.5,pch=16, col="gray") +   #add círculos de r
 points(spa$X, spa$Y, cex=riqueza/3.5,pch=1) +   #permite vermos as sobreposições dos círculos
 points(spa$X, spa$Y, cex=0.5, pch=16)   #...
 
+###########################
 ### Explorando Correlações
 
 #vamos criar um objeto com as variáveis físico-químicas da agua:
@@ -77,5 +78,16 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...) #podes modifi
 }
 pairs(fisqui, diag.panel=panel.hist, upper.panel=panel.cor) #parte onde insere seus dados
 #o painel criado passa a ter, os índices em um triângulo, a disperção em outro, e histogramas com os rótulos na diagonal principal.
+
+
+######################
+# Aula3 21-viii-2017 #
+######################
+
+
+
+
+
+
 
 
