@@ -5,8 +5,8 @@
 # # Read the data from Excel into R
 mydata <- read_excel("exercise1.xlsx")
 
-#A time series (ts object) can be thought of as a vector or matrix of numbers, along with some information about 
-#what times those numbers were recorded. This information is stored in a "ts" object in R.
+#A time series (ts object) can be thought of as a vector or matrix of numbers, 
+#with some information about what times those numbers were recorded. This information is stored in a "ts" object in R.
 
 # # Create a ts object called myts
 myts <- ts(mydata[, 2:4], start = c(1981, 1), frequency = 4)
@@ -51,10 +51,9 @@ library(fpp2)
 autoplot(a10)
 ggseasonplot(a10)
 
-#An interesting variant of a season plot uses polar coordinates, where the time axis is circular rather than horizontal. 
-#Try producing a polar coordinate plot for the a10 data using ggseasonplot(). Simply add a polar keyword and set it to TRUE.
+# An interesting variant of a season plot uses polar coordinates= time axis is CIRCULAR 
 
-# # Produce a polar coordinate season plot for the a10 data
+# # Produce a polar coordinate season plot for the a10 data.  Simply add a polar keyword and set it to TRUE.
 ggseasonplot(a10, polar = TRUE)
 
 #You will also use the ausbeer data from the fpp2 package. This contains quarterly beer production for Australia. 
