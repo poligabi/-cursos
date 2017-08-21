@@ -80,9 +80,9 @@ pairs(fisqui, diag.panel=panel.hist, upper.panel=panel.cor) #parte onde insere s
 #o painel criado passa a ter, os índices em um triângulo, a disperção em outro, e histogramas com os rótulos na diagonal principal.
 
 
-######################
-# Aula3 21-viii-2017 #
-######################
+#####################################################
+# Aula3 Matriz de distância e Clusters 21-viii-2017 #
+#####################################################
 library("vegan")
 setwd("C:/R/NEwR")
 
@@ -100,10 +100,17 @@ summary(fisqui)
 fisqui.pad<-decostand(fisqui, method="standardize")
 
 #Criando matriz de distancia
+fisqui.pad.euc<-dist(fisqui.pad, method="euclidean") #o method euclidean ja é o padrão da função dist, R faria sem especificar 
 
+# Calculando o cluster
+fisqui.pad.euc.clus<-hclust(fisqui.pad.euc, method="average") #method q usa medias para comparar distacias
+#antes de plotar, vamos calcular a correlação cofenetica pra nao tirar conclusões e se decepcionar depois
+fisqui.pad.euc.coph<-cophenetic(fisqui.pad.euc.clus)
+cor(fisqui.pad.euc, fisqui.pad.euc.coph) #compara matriz cofenetica com a matriz euclidiana, mais perto de 1 = +semelhantes :D
+#resultado 0.8742811 = coeficiente de correlação cofenética
 
-
-
+plot(fisqui.pad.euc.clus, hang=-1) #plot só faz o cluster apontando p baixo, hang-1 estica e padroniza o dendograma
+#
 
 
 
