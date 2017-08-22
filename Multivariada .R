@@ -83,8 +83,8 @@ plot(spa$X, spa$Y, type="n", ylim=c(20,120),    #função concatenar foi usada p
 xlab= "Coordenada X(km)", ylab= "Coordenada Y(km)", las=1) +
 lines(spa$X, spa$Y, col="blue4") +
 points(spa$X, spa$Y, cex=riqueza/3.5,pch=16, col="gray") +   #add círculos de riqueza (dividiu por 3.5 pois riqueza ficava muito grande no grafico)
-points(spa$X, spa$Y, cex=riqueza/3.5,pch=1) +   #permite vermos as sobreposições dos círculos
-points(spa$X, spa$Y, cex=0.5, pch=16)   #...
+points(spa$X, spa$Y, cex=riqueza/3.5,pch=1) +   #add bordas, permite vermos as sobreposições dos círculos
+points(spa$X, spa$Y, cex=0.5, pch=16)   #add centros
 
 ###########################
 ### Explorando Correlações
@@ -169,13 +169,13 @@ plot(fisquipad.euc.dend, horiz=T) #copie como metafile, abra no office, botão d
 # Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
 # Função vegdist Cap3 pag:35-40
 #############################################
-install.packages("ade4")
+install.packages("ade4") #prof nao usou
 library(ade4)
 library(vegan) #carregado APÓS ade4 p evitar conflitos
-install.packages("gclus")
-library(gclus)
 library(cluster)
-install.packages("FD")
+install.packages("gclus") #usado p mapa d calor
+library(gclus)
+install.packages("FD") #prof nao usou
 library(FD)
 
 setwd("C:/R/Multivariada)
@@ -255,12 +255,16 @@ cor(spe.bray, cluster1.coph)
 spe.bray.dend<-as.dendrogram(cluster1)
 plot(spe.bray.dend, horiz=T) 
 
+## Calcular Jaccard:
+# method="jaccard", binary=TRUE nos argumentos
+# binary=TRUE excencial, tranforma dados em binários (tudo >1 vira 1), exceto se dados já forem binários.
+
 #Mapa de Calor:
 install.packages("gclus")
 library(gclus)
 
 source("coldiss.R") 
-# podes salvar arquivo (script) em uma area de trabalho / pacote e o source executa o arquivo inteiro
+# podes salvar arquivo (script) em uma area de trabalho, ou pacote, e o source executa o arquivo inteiro
 coldiss(spe.bray)
 
 
