@@ -128,8 +128,6 @@ pairs(fisqui, diag.panel=panel.hist, upper.panel=panel.cor) #parte onde insere s
 #####################################################
 library("vegan")
 setwd("C:/R/NEwR")
-
-# criar 3 objetos (variáveis espaciais, ambientais e de espécies)
 spa<-read.csv("DoubsSpa.csv", row.names=1) 
 env<-read.csv("DoubsEnv.csv", row.names=1)
 spe<-read.csv("DoubsSpe.csv", row.names=1)
@@ -179,8 +177,7 @@ install.packages("FD") #prof nao usou
 library(FD)
 
 setwd("C:/R/Multivariada)
-
-spe<-read.csv("DoubsSpe.csv", row.names=1) #row.names informa qual coluna tem nomes
+spe<-read.csv("DoubsSpe.csv", row.names=1)
 spa<-read.csv("DoubsSpa.csv", row.names=1)
 env<-read.csv("DoubsEnv.csv", row.names=1)
 
@@ -206,7 +203,7 @@ source("coldiss.R")
 #coldiss(D=dist.object, nc=4,byrank=TRUE,diag=FALSE) # argumentos padrão
 #byrank= TRUE :=sized categories 	FALSE :=length intervals
 #diag= TRUE :rótulos posicionados na diagonal
-#nc= numeor de cores no mapa
+#nc= numero de cores no mapa (magenta=+prox, cyan=+dist)
 
 #Bray-curtis
 coldiss(spe.db, byrank=FALSE,diag=TRUE)
@@ -219,14 +216,12 @@ coldiss(spe.dj, byrank=FALSE,diag=TRUE)
 # Aula 4 Resolvendo dever de casa
 # 22-vii-2017
 #######################################
-
-# criar 3 objetos (variáveis espaciais, ambientais e de espécies)
 spa<-read.csv("DoubsSpa.csv", row.names=1) 
 env<-read.csv("DoubsEnv.csv", row.names=1)
 spe<-read.csv("DoubsSpe.csv", row.names=1)
 
 #Remover linha vazia (nao tem sp registradas)
-spe<- spe[-8,] #comando arriscado pois se repetires comando ele tirará a linha -8 de novo mesmo sem ser a q queriamos tirar
+not use: spe<- spe[-8,] #comando arriscado pois se repetires comando ele tirará a linha -8 de novo mesmo sem ser a q queriamos tirar
                # melhor ou renomear diferente, ou tirar direto na planilha de campo se a info é tão desencessária
 spe_8<- spe
 env_8<- env
@@ -263,16 +258,49 @@ plot(spe.bray.dend, horiz=T)
 install.packages("gclus")
 library(gclus)
 
-source("coldiss.R") 
+source("coldiss.R") #nesse caso há uma função completa já salva
 # podes salvar arquivo (script) em uma area de trabalho, ou pacote, e o source executa o arquivo inteiro
 coldiss(spe.bray)
 
+dmat.color(spe.bray, colors= default.dmat.color, byrank=, ...) # Modificar as cores da matriz
 
-######################
-# Aula4-p2 Ordenação
-# 22-viii-2017
-#######################
+#############################
+# Aula4-p2 Ordenação -> PCA #
+# 22-viii-2017              #
+#############################
+setwd("C:/R/NEwR")
+spa<-read.csv("DoubsSpa.csv", row.names=1) 
+env<-read.csv("DoubsEnv.csv", row.names=1)
+spe<-read.csv("DoubsSpe.csv", row.names=1)
+fisqui <- env[,5:11]
+spe_8<- spe
+library("vegan")
 
+pca.fisqui<-rda(fisqui, scale=T) 
+#scale=T é oq vai padronizar (standardization) os dados, sem ele será usado a matriz de covariancia
+#só nao precisa dele qnd todas as variáveis tem a mesma unidade
+
+summary(pca.fisqui)
+#'cumulative proportion' quanta explicação é fornecida por n Componentes Principais (PC2=olhar p 2 componentes, é até onde vamos usar, par a par)
+#'species scores' qnt informação cada variável tras p explica cada Componente Principal (+valor, +explica)
+# valores do componente (site scores) pode ser usado como variável
+
+biplot(pca.fisqui)
+# grafico PC1 x PC2, cada linha vira um ponto
+# as variáveis fisico-químicas são expressas em linhas de explicação (inclinação indicada no 'species scores')
+# +prox =+correlacionadas, +perpendiculares=+independente das outras
+
+str(pca.fisqui) #mostra resultado por dentro
+ pca.fisqui$CA$eig  #chama só os autovalores 'eigenvalue'
+pca.fisqui$CA$v  #Valores das variáveis 'species scores'
+pca.fisqui$CA$u  #Coordenadas das unidades amostrais 'site scores'
+
+#armazenar os 2 primeiros componentes (se quiser fazer... ex regressão)
+pc1<-pca.fisqui$CA$u[,1]
+pc2<-pca.fisqui$CA$u[,2]
+#exemplo tosco:
+riqueza<-specnumber(spe)
+plot(riqueza~pc1)
 
 
 
