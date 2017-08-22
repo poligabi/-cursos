@@ -165,10 +165,9 @@ plot(fisquipad.euc.dend, horiz=T) #copie como metafile, abra no office, botão d
                                   #e aí podes modificar qualquer elemento do gráfico
 
 #########################################
-#Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
-#Função vegdist
-##########################################
-# Dever de casa -> aula3 ->Cap3 pag:35-40
+# Dever de casa
+# Pesquise no livro e calcule 2 dendogramas usando bray-curtis e jaccard:
+# Função vegdist Cap3 pag:35-40
 #############################################
 install.packages("ade4")
 library(ade4)
@@ -203,8 +202,8 @@ head(sqrt(spe.dj))
 ## Mapa de Calor
 
 library(gclus)
-source("coldiss.r")
-#coldiss(D=dist.object, nc=4,byrank=TRUE,diag=FALSE)
+source("coldiss.R")
+#coldiss(D=dist.object, nc=4,byrank=TRUE,diag=FALSE) # argumentos padrão
 #byrank= TRUE :=sized categories 	FALSE :=length intervals
 #diag= TRUE :rótulos posicionados na diagonal
 #nc= numeor de cores no mapa
@@ -260,5 +259,12 @@ plot(spe.bray.dend, horiz=T)
 install.packages("gclus")
 library(gclus)
 
-source("coldiss.R")
-coldiss(spe.bray, byrank=FALSE,diag=TRUE)
+source("coldiss.R") 
+# podes salvar arquivo (script) em uma area de trabalho / pacote e o source executa o arquivo inteiro
+coldiss(spe.bray)
+
+
+######################
+# Aula4-p2 Ordenação
+# 22-viii-2017
+#######################
