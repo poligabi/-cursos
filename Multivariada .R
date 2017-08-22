@@ -4,7 +4,7 @@
 data(iris) #Carrega data.frame
 iris       #Mostra objeto todo (nessa caso o data.frame)
 summary(iris) #Resume as estatísticas descritivas do data.frame
-str(iris)   #Mostra a estrutura do objetivo (qnd o objeto é muito grande, como é o caso d estatística multivariada, ele é mais interessante que o summary)
+str(iris)   #Mostra a estrutura do objeto (qnd objeto é muito grande, como na multivariada, é +interessante que o summary)
 
 iris$Sepal.Width   #Mostra só essa coluna
 iris [,2]          #Mostra só essa colun
@@ -82,7 +82,7 @@ riqueza<-specnumber(spe) #função do pacote q calcula riqueza através dos dado
 plot(spa$X, spa$Y, type="n", ylim=c(20,120),    #função concatenar foi usada p ...
 xlab= "Coordenada X(km)", ylab= "Coordenada Y(km)", las=1) +
 lines(spa$X, spa$Y, col="blue4") +
-points(spa$X, spa$Y, cex=riqueza/3.5,pch=16, col="gray") +   #add círculos de riqueza (dividiu por 3.5 pq a riqueza toda fica muito grande no grafico)
+points(spa$X, spa$Y, cex=riqueza/3.5,pch=16, col="gray") +   #add círculos de riqueza (dividiu por 3.5 pois riqueza ficava muito grande no grafico)
 points(spa$X, spa$Y, cex=riqueza/3.5,pch=1) +   #permite vermos as sobreposições dos círculos
 points(spa$X, spa$Y, cex=0.5, pch=16)   #...
 
@@ -268,3 +268,14 @@ coldiss(spe.bray)
 # Aula4-p2 Ordenação
 # 22-viii-2017
 #######################
+
+
+
+
+
+
+
+
+
+
+
