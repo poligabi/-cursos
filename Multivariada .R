@@ -200,16 +200,65 @@ spe.dj<-vegdist(spe, "jac",  binary=TRUE)
 head(spe.dj)
 head(sqrt(spe.dj))
 
-####################################### nao consegui fazer o gráfico
-##Grafico
+## Mapa de Calor
+
 library(gclus)
 source("coldiss.r")
 #coldiss(D=dist.object, nc=4,byrank=TRUE,diag=FALSE)
 #byrank= TRUE :=sized categories 	FALSE :=length intervals
 #diag= TRUE :rótulos posicionados na diagonal
+#nc= numeor de cores no mapa
 
 #Bray-curtis
 coldiss(spe.db, byrank=FALSE,diag=TRUE)
 #Jaccard
 coldiss(spe.dj, byrank=FALSE,diag=TRUE)
 
+
+
+######################################
+# Aula 4 Resolvendo dever de casa
+# 22-vii-2017
+#######################################
+
+# criar 3 objetos (variáveis espaciais, ambientais e de espécies)
+spa<-read.csv("DoubsSpa.csv", row.names=1) 
+env<-read.csv("DoubsEnv.csv", row.names=1)
+spe<-read.csv("DoubsSpe.csv", row.names=1)
+
+#Remover linha vazia (nao tem sp registradas)
+spe<- spe[-8,] #comando arriscado pois se repetires comando ele tirará a linha -8 de novo mesmo sem ser a q queriamos tirar
+               # melhor ou renomear diferente, ou tirar direto na planilha de campo se a info é tão desencessária
+spe_8<- spe
+env_8<- env
+spa_8<- spa
+
+#antes vamos olhar a abundância por species
+abund.sp<-colSums(spe_8)
+abund.sp
+hist(abund.sp, col="gray")
+
+#abundancia por unidade amostral
+abund.ua<-rowSums(spe_8)
+abund.ua
+hist(abund.ua, col="gray") 
+
+## Calcular cluster por Bray-Curtis:
+# 1-Não precisa transformar
+# 2-Calcular Matriz
+spe.bray <-vegdist(spe_8, method="bray")
+# 3-Calcular cluster
+cluster1<-hclust(spe.bray, method="average")
+# 4-Coeficiente de correlação cofenética
+cluster1.coph<-cophenetic(cluster1)
+cor(spe.bray, cluster1.coph)
+# 5-Visualizar cluster
+spe.bray.dend<-as.dendrogram(cluster1)
+plot(spe.bray.dend, horiz=T) 
+
+#Mapa de Calor:
+install.packages("gclus")
+library(gclus)
+
+source("coldiss.R")
+coldiss(spe.bray, byrank=FALSE,diag=TRUE)
