@@ -302,8 +302,18 @@ pc2<-pca.fisqui$CA$u[,2]
 riqueza<-specnumber(spe)
 plot(riqueza~pc1)
 
+#######################################
+PCA meus dados
 
-
+library("vegan")
+setwd("C:/R/Multivariada")
+tx<-read.csv("consumDiario.csv", row.names=1:3) 
+str(tx)
+txn<-tx[,c(4:77,12:17)]
+pca.txn<-rda(txn, scale=T) 
+summary(pca.txn)
+biplot(pca.txn)
+#####################################3
 
 
 
