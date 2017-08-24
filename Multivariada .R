@@ -70,7 +70,7 @@ str(env)  #podes conferir usando summary(), mas não é muito pratico qnd os dad
  
 plot(spa$X, spa$Y) #autor sugere ir add camadas em camadas, nesse caso, com dados espaciais, vemos só os pontos do rio
 
-plot(spa$X, spa$Y, type="n")    #type=n gera gráfico sem nada, pontos estão lá mas invisíveis
+plot(spa$X, spa$Y, type="n")    #type=n gera gráfico sem nada, pontos estão lá mas invisíveis, dai vais add caract dele nas funções abaixo
 lines(spa$X, spa$Y, col="blue4", lwd=2)     #slwd= grossura da linha, eleciona todos juntos no script e executa (ctrlR), ou add + 
 text(spa$X, spa$Y, row.names(spa), col="red")   #add rotulo de cada variável
 
@@ -223,9 +223,9 @@ spe<-read.csv("DoubsSpe.csv", row.names=1)
 #Remover linha vazia (nao tem sp registradas)
 not use: spe<- spe[-8,] #comando arriscado pois se repetires comando ele tirará a linha -8 de novo mesmo sem ser a q queriamos tirar
                # melhor ou renomear diferente, ou tirar direto na planilha de campo se a info é tão desencessária
-spe_8<- spe
-env_8<- env
-spa_8<- spa
+spe_8<- spe[-8,]
+env_8<- env[-8,]
+spa_8<- spa[-8,]
 
 #antes vamos olhar a abundância por species
 abund.sp<-colSums(spe_8)
@@ -273,7 +273,7 @@ spa<-read.csv("DoubsSpa.csv", row.names=1)
 env<-read.csv("DoubsEnv.csv", row.names=1)
 spe<-read.csv("DoubsSpe.csv", row.names=1)
 fisqui <- env[,5:11]
-spe_8<- spe
+spe_8<- spe[-8,]
 library("vegan")
 
 pca.fisqui<-rda(fisqui, scale=T) 
@@ -307,17 +307,52 @@ PCA meus dados
 
 library("vegan")
 setwd("C:/R/Multivariada")
-tx<-read.csv("consumDiario.csv", row.names=1:3) 
-str(tx)
-txn<-tx[,c(4:77,12:17)]
+condi<-read.csv("consumDiario.csv", row.names=1:3) 
+str(condi)
+txn<-condi[,c(4:77,12:17)]
 pca.txn<-rda(txn, scale=T) 
 summary(pca.txn)
 biplot(pca.txn)
-#####################################3
+#####################################
 
+# Aula 5 +Ordenações (NMDS) 
+# 24-viii-2017
+########################################
+setwd("C:/R/NEwR")
+spa<-read.csv("DoubsSpa.csv", row.names=1) #row.names informa qual coluna tem 'nome" de cada variável (variavel 1,2,3,4,5...)
+env<-read.csv("DoubsEnv.csv", row.names=1)
+spe<-read.csv("DoubsSpe.csv", row.names=1)
+fisqui <- env[,5:11]
+spe_8<-spe[-8, ]
+env_8<- env[-8,]
+library("vegan")
 
+#criando a matriz de distância
+spe.jac<-vegdist(spe_8, method="jaccard", binary=T) #lembre d sempre por binary=T qnd usa jaccard
 
+#analise NMDS
+help(metaMDS)  #ver caracteristicas da função: try= repetição mínima; trymax=maximo de repetições
+nmds.jac<-metaMDS(spe.jac) #ele ele avisa "New best solution' cada vez q acha um novo resultado ótimo
+     #mas ele ainda continua rodando as quantias demandadas, avisa tbm de resultados similares ao ótimo
+     # se acha no início ótimo, se ele demora p achar, aumente as repetições, eventualmente ocorrerá momento q as 10 ultimas soluções são inúteis, aí vc pára.
 
+plot(nmds.jac) #grafico de disperção
+plot(nmds.jac, type="t")       #type="t" troca bolinhas pelos nomes das unidades amostrais
+      
+#vamos olhar altitude na tentativa de agrupar os dados
+summary(env)
+as.data.frame(env[,2]) #usa o as(mostre-me como) p R mostrar os dados em um colunas(data.frame) ao invés da forma de vetor(tudo em linhas)
 
+#olhamos e vamos classsificar como 1-10 (mais altas), depois 11-, 
+#se vais a campo essa quebra deveria ja ser definida por conheceres as características da area 
+      
+#Criar classe (usar Logica)
+alt.clas<-ifelse(env_8$alt>600,"alto","baixo") #if >600 =alto, else =baixo
+alt.clas<-as.factor(alt.clas) #transforma o objeto em fator (variável categórica) q agora pode ser usada nas analises
+      #esse é um argumento circular sem perigo, bão gera erro se executar alt.clas 2 vezes
+      
+cores.alt<-c("blue4","red4")
 
-
+plot(nmds.jac, type="n")	#grafico em branco e vais add as características 
+points(nmds.jac, pch=16, col=cores.alt[alt.clas])   
+      #no resultado vimos q as espécies de altitudes +baixas apresentam uma distribuição no grafico +heterogenea
