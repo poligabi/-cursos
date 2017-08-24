@@ -156,3 +156,47 @@ root.mainloop()
 pip intall pyinstaller 
 pyinstaller --onefile --windowed "nome do script.py" #cria pastas e dentro da dist deve estar seu .exe
 
+                                          
+#################################################################################                                          
+#### Measure the script execution time by using the time built-in Python module. 
+                                          
+# Simply edit your .py file and insert two lines on top and two lines at the bottom as shown below:
+import time 
+start = time.time()
+
+"the code you want to test stays here"
+
+end = time.time() 
+print(end - start)
+
+#Executing that code will print out the time in seconds that it took for the script to execute. 
+#Example: your duty is to generate a list where each item is a product of the multiplication of the items of another list by two. 
+#You can either use a for loop or a list comprehension to do that. Here is how you would check the time of each of the scripts:
+
+#Using a for loop:
+import time 
+start = time.time()
+
+a = range(100000) 
+b = [] 
+for i in a:
+    b.append(i*2)
+
+end = time.time() 
+print(end - start)
+
+#That would output 0.02017498016357422 seconds on my computer. So, the script took around 2/100 of a second to execute.
+
+#Let's now try to build the same list, but instead of using a for loop we will use list comprehension:
+
+import time 
+start = time.time()
+
+a = range(100000) 
+b = [i*2 for i in a]
+
+end = time.time() 
+print(end - start)
+
+#That would output 0.009402990341186523 which means two times faster than the for loop. Quite a difference!                                          
+                                          
