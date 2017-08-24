@@ -325,6 +325,7 @@ spe<-read.csv("DoubsSpe.csv", row.names=1)
 fisqui <- env[,5:11]
 spe_8<-spe[-8, ]
 env_8<- env[-8,]
+fisqui_8<-fisqui[-8,]
 library("vegan")
 
 #criando a matriz de distância
@@ -353,6 +354,27 @@ alt.clas<-as.factor(alt.clas) #transforma o objeto em fator (variável categóri
       
 cores.alt<-c("blue4","red4")
 
-plot(nmds.jac, type="n")	#grafico em branco e vais add as características 
+plot(nmds.jac, type="n")	#grafico em branco e vais add as características: 
 points(nmds.jac, pch=16, col=cores.alt[alt.clas])   
       #no resultado vimos q as espécies de altitudes +baixas apresentam uma distribuição no grafico +heterogenea
+ordihull(nmds.jac, alt.clas, col=cores.alt) #add poligonos convexos
+legend("topleft", legend=levels(alt.clas), pch=16, col=cores.alt)
+
+      fisqui_8<-fisqui[-8,]
+
+## envfit
+envfit.jac<-envfit(nmds.jac,fisqui_8) #analises sem nome, tem a logica (olhar o help)
+#entao ao citar deves explicar: ela busca relações lineares em uma analise de ordenação
+plot(envfit.jac) #aparece as linhas de regressões de cada variável fisico-quimicas no grafico como na PCA
+envfit.jac	#mostra os resultados das regressões (relações lineares)
+#no caso de muitas variáveis, ao invés de usar os dados fisico-químicos direto, poderias aplicar os resultados da PCA q já fizemos dos dados fisico-químicos
+
+#Vamos verificar se uma das variáveis inportantes (oxigenação) tem relação com a altitude q usamos p agrupar
+plot(env_8$oxy~env_8$alt, pch=16)
+cor(env_8$oxy,env_8$alt)
+
+boxplot(env_8$oxy~alt.clas, range=0)
+boxplot(env_8$nit~alt.clas, range=0)
+#resultados até agora, oxigênio é importante para determinar a composição
+#e nitrogênio parece se conectar bem com a divisão de classes de altitude
+
