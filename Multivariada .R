@@ -291,7 +291,7 @@ biplot(pca.fisqui)
 # +prox =+correlacionadas, +perpendiculares=+independente das outras
 
 str(pca.fisqui) #mostra resultado por dentro
- pca.fisqui$CA$eig  #chama só os autovalores 'eigenvalue'
+pca.fisqui$CA$eig  #chama só os autovalores 'eigenvalue'
 pca.fisqui$CA$v  #Valores das variáveis 'species scores'
 pca.fisqui$CA$u  #Coordenadas das unidades amostrais 'site scores'
 
@@ -378,3 +378,49 @@ boxplot(env_8$nit~alt.clas, range=0)
 #resultados até agora, oxigênio é importante para determinar a composição
 #e nitrogênio parece se conectar bem com a divisão de classes de altitude
 
+##################################
+# Aula 6 Permutação de Matrizes (Mantel)
+# 25-viii-2017
+##################################
+setwd("C:/R/NEwR")
+spa<-read.csv("DoubsSpa.csv", row.names=1) #row.names informa qual coluna tem 'nome" de cada variável (variavel 1,2,3,4,5...)
+env<-read.csv("DoubsEnv.csv", row.names=1)
+spe<-read.csv("DoubsSpe.csv", row.names=1)
+fisqui <- env[,5:11]
+spe_8<-spe[-8, ]
+spa_8<-spa[-8, ]
+env_8<- env[-8,]
+fisqui_8<-fisqui[-8,]
+library("vegan")
+      
+      
+## Teste de Mantel      
+      
+fisqui.pad<-decostand(fisqui_8, method="standardize") 
+fisqui.euc<-vegdist(fisqui.pad, method="euclidean") #matriz de distância de dados físico-químicos
+      
+spe.jac<-vegdist(spe_8, method="jaccard", binary=T) #matriz de distância de dados de espécies
+
+mantel(fisqui.euc, spe.jac)      
+# Mantel statistic r: 0.4199 #por volta de 43% das variações são explicadas pelas variaveis fisico-quimicas (mas a analise não dá causa e efeito)
+#      Significance: 0.001 
+
+# Sheppard plot       
+plot(fisqui.euc, spe.jac, pch=16, cex=0.5)   # grafico mostra(funil) q a partir de certa distância a variação passa a ser enorme
+      #na pratica dados geraram um funil invertido, ambientes com diferentes características se encontra sp. bem diferentes, 
+      #mas qnd carcteristicas são próxima a presença de sp. é imprevisível, tem de muito prox a muito diferentes.
+
+spa.euc<-vegdist(spa_8, method="euclidean") #matriz de distância de dados espaciais     
+
+# Mantel parcial:      
+mantel.partial(fisqui.euc, spe.jac, spa.euc)    
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
