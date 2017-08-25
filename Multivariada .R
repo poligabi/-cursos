@@ -434,9 +434,16 @@ plot(resultado.anosim)  #mostra dif (mediana) dentro dos grupos e entre os grupo
 resultado.adonis<-adonis(spe.jac~alt.clas)
 resultado.adonis #gera um coenficiente de determinação (R2=proporção da variável resposta explicada pela explicativa)(anosim mostra correlaçao)
    
+#########################################      
+## Autocorrelogramas de Mantel      
       
-      
-      
+jac.spa<-mantel.correlog(spe.jac, spa.euc) #aqui a ordem importa, a nao ser q escreva por extenso, primeiro argumennto: d.eco= segundo: d.geo=
+jac.spa	#cria classes de distância (class.index= até 9m, até 25m, até 42m...), 
+#p cada classe indica o n presente nelas (qnd muito baixo o n não consegue calcular alto correlação)
+#há autocorrelação qnd Pr(mantel) menor q 0.05
+plot(jac.spa) #quadradinho preto autorrelação presente, branco ausente(não signif) ou não calculado
+#quando a linha vermelha cruza a linha dos resultado é o ponto ideal que não há autocorrelação espacial, seria a distância entre coletores q deves usar na sua coleta de dados
+
       
       
       
