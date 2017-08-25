@@ -70,8 +70,9 @@ help(pandas)
 dir(pandas.DataFrame) #mostra todas as funcionalidades para Data Frame
 pandas.DataFrame.to_excel? # dá as caracteristicas do diretorio to_excel q fas parte do ramo DataFrame em padas
                  
-
-##  Generating KML files (pontos de coordenadas do google earth)
+##################################################################
+##  Generating KML files (pontos de coordenadas do google earth) #
+##################################################################                 
 pip install simplekml #no prompt d comando
 import simplekm   #no python
                  
@@ -91,16 +92,20 @@ m=float(m) #Sem isso o codigo nao conseguira colocar resultado no texto
 milesToKm(m)
     #se colares este script em um prompt d comando aparecerá instrução: Please enter miles: 
     #vc digita 100 e o resultado 160.93 km é mostrado
-
                                     
+#############################
+# Achar caminho no explorer #                                     
+#############################                                    
 import tkinder
 from tkinder.filedialog import askopenfilename
                                     
 filepath=askopenfilename() #Tu seleciona o arquivo que queres
 filepath  #O python vai mostrar o caminha ate ele (ex. C:\\R\\Coordinates.csv)                                    
-                                    
-### Making a Graphical User Interface (GUI) usando tkinder ##
 
+#############################################################                                   
+### Making a Graphical User Interface (GUI) usando tkinder ##
+#############################################################
+                                    
 # Exemplo: Script para criar dados .kml usando dados .csv
 import simplekml
 import pandas
@@ -158,7 +163,8 @@ pyinstaller --onefile --windowed "nome do script.py" #cria pastas e dentro da di
 
                                           
 #################################################################################                                          
-#### Measure the script execution time by using the time built-in Python module. 
+### Measure the script execution time by using the time built-in Python module. 
+##############################################################################
                                           
 # Simply edit your .py file and insert two lines on top and two lines at the bottom as shown below:
 import time 
