@@ -378,10 +378,10 @@ boxplot(env_8$nit~alt.clas, range=0)
 #resultados até agora, oxigênio é importante para determinar a composição
 #e nitrogênio parece se conectar bem com a divisão de classes de altitude
 
-##################################
-# Aula 6 Permutação de Matrizes (Mantel)
-# 25-viii-2017
-##################################
+############################################################################
+# Aula 6 Permutação de Matrizes (Mantel, anosim, adonis, autocorrelograma) #
+# 25-viii-2017                                                             #
+############################################################################
 setwd("C:/R/NEwR")
 spa<-read.csv("DoubsSpa.csv", row.names=1) #row.names informa qual coluna tem 'nome" de cada variável (variavel 1,2,3,4,5...)
 env<-read.csv("DoubsEnv.csv", row.names=1)
@@ -444,6 +444,29 @@ jac.spa	#cria classes de distância (class.index= até 9m, até 25m, até 42m...
 plot(jac.spa) #quadradinho preto autorrelação presente, branco ausente(não signif) ou não calculado
 #quando a linha vermelha cruza a linha dos resultado é o ponto ideal que não há autocorrelação espacial, seria a distância entre coletores q deves usar na sua coleta de dados
 
+##############################
+## Métodos de filtros espaciais -> filtrar os resíduos
+
+riqueza<-specnumber(spe_8)
+
+#1-PCA:
+spa.pca<-princomp(spa.euc) 	#usamos pricomp pois função rda nao aceita objeto q não seja data.frame, converter p matriz chato se tem outras q fação PCA
+spa.pca
+
+#2-Extrai os filtros:
+summary(spa.pca)	#Proporção de explicação de cada componente p escolher quais usar
+filtros<-spa.pca$scores[,1:5] #até o 5 já explica 99%, scores é o local dos resultados da PCA por unidade amostral
+
+#3-Reg mpultipla
+resultado.filtros<-lm(riqueza~filtros)
+summary(resultado.filtros)
+
+#4-Pegando os resíduos
+riqueza.res<-resultado.filtros$residuals
+riqueza.res
+
+#5- agora podes usar a variável como desejado 
+#resíduos são a parte das variáveis sem receber influencia das variáveis analisadas até o momento (espaciais)
       
       
       
