@@ -415,8 +415,25 @@ spa.euc<-vegdist(spa_8, method="euclidean") #matriz de distância de dados espac
 # Mantel parcial:      
 mantel.partial(fisqui.euc, spe.jac, spa.euc)    
       
+######################
+#Anosim e Permanova(adonis)
+
+#Criar variável categórica:
+alt.clas<-ifelse(env_8$alt>600,"alto","baixo") #if >600 =alto, else =baixo
+alt.clas<-as.factor(alt.clas) #transforma o objeto em fator (variável categórica)
+
+##
+#Anosim
+resultado.anosim<-anosim(spe.jac,alt.clas)
+resultado.anosim        #maior R maior diferença de composição entre os grupos
+plot(resultado.anosim)  #mostra dif (mediana) dentro dos grupos e entre os grupos, a largura do boxplot =n, 
+      #resultado mostrou diferença menor dentro dos grupos do que entre os grupos
       
-      
+##      
+# adonis  
+resultado.adonis<-adonis(spe.jac~alt.clas)
+resultado.adonis #gera um coenficiente de determinação (R2=proporção da variável resposta explicada pela explicativa)(anosim mostra correlaçao)
+   
       
       
       
