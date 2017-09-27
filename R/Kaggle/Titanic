@@ -1,0 +1,108 @@
+#########################################
+# Kaggle R Tutorial on Machine Learning #
+#########################################
+
+
+# Import the training set: train
+train_url <- "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.csv"
+train <- read.csv(train_url)
+  
+# Import the testing set: test
+test_url <- "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv"
+test <- read.csv(test_url)
+
+str(train)
+'data.frame':	891 obs. of  12 variables:
+ $ PassengerId: int  1 2 3 4 5 6 7 8 9 10 ...
+ $ Survived   : int  0 1 1 1 0 0 0 0 1 1 ...
+ $ Pclass     : int  3 1 3 1 3 3 1 3 3 2 ...
+ $ Name       : Factor w/ 891 levels "Abbing, Mr. Anthony",..: 109 191 354 273 16 555 516 625 413 577 ...
+ $ Sex        : Factor w/ 2 levels "female","male": 2 1 1 1 2 2 2 2 1 1 ...
+ $ Age        : num  22 38 26 35 35 NA 54 2 27 14 ...
+ $ SibSp      : int  1 1 0 1 0 0 0 3 0 1 ...
+ $ Parch      : int  0 0 0 0 0 0 0 1 2 0 ...
+ $ Ticket     : Factor w/ 681 levels "110152","110413",..: 524 597 670 50 473 276 86 396 345 133 ...
+ $ Fare       : num  7.25 71.28 7.92 53.1 8.05 ...
+ $ Cabin      : Factor w/ 148 levels "","A10","A14",..: 1 83 1 57 1 1 131 1 1 1 ...
+ $ Embarked   : Factor w/ 4 levels "","C","Q","S": 4 2 4 4 4 3 4 4 4 2 ...
+
+#How many people in your training set survived the disaster with the Titanic? 
+#To see this, you can use the table() command in combination with the $-operator to select a single column of a data frame:
+
+# absolute numbers
+table(train$Survived) 
+
+# proportions
+prop.table(table(train$Survived))
+
+#If you run these commands in the console, you'll see that 549 individuals died (62%) and 342 survived (38%). 
+#A simple prediction heuristic could thus be "majority wins": you predict every unseen observation to not survive.
+
+#In general, the table() command can help you to explore which variables have predictive value. 
+#For example, maybe gender could play a role as well? For a two-way comparison, also including gender, you can use
+
+table(train$Sex, train$Survived)
+          0   1
+  female  81 233
+  male   468 109
+  
+#To get proportions, you can again wrap prop.table() around table(), 
+#but you'll have to specify whether you want row-wise or column-wise proportions: 
+#By a second argument of prop.table(), called margin= 1 or 2 respectively.
+
+# row-wise proportions
+prop.table(table(train$Sex, train$Survived), margin=1)
+                0         1
+  female 0.2579618 0.7420382
+  male   0.8110919 0.1889081
+# column-wise proportions
+prop.table(table(train$Sex, train$Survived), margin=2)
+                 0         1
+  female 0.1475410 0.6812865
+  male   0.8524590 0.3187135
+  
+#Another variable that could influence survival is age: it's probable children were saved first. 
+#You can test this by creating a new column with a categorical variable child.
+#To add this new variable you need to do two things:
+
+# 1- Create a new column, which is done through the $ operator. To create a new column, lucky, for example:
+train$lucky <- NA
+
+# 2- Provide the values for each observation (i.e., row) based on the age of the passenger. 
+#You can use a boolean test inside square brackets for this. 
+#For example, to set the lucky column to TRUE for passengers that survived the disaster, and the others to FALSE, you could use:
+train$lucky[train$Survived == 1] <- TRUE
+train$lucky[train$Survived == 0] <- FALSE
+
+# Create the column child, and indicate whether child or no child
+train$Child <- NA
+train$Child[train$Age < 18] <- 1
+train$Child[train$Age >= 18] <- 0
+
+# Two-way comparison, in row-wise proportions
+prop.table(table(train$Child, train$Survived), margin=1)
+          0         1
+  0 0.6189684 0.3810316
+  1 0.4601770 0.5398230
+  
+# your first prediction: all females in the test set survive and all males in the test set die.
+# You use your test set for validating your predictions. 
+#You might have seen that, contrary to the training set, the test set has no Survived column. 
+# You add such a column using your predicted values. 
+#Kaggle will use this column (= your predictions) to score your performance.
+
+# Copy of test
+test_one <- test
+
+# Add an additional column, Survived, that you initialize to zero.
+test_one$Survived <- 0
+
+# Set Survived to 1 if Sex equals "female"
+test_one$Survived[test$Sex == "female"] <- 1
+
+##########################
+# From icebergs to trees #
+##########################
+
+
+
