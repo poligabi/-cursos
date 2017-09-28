@@ -7,4 +7,114 @@
 #The data is stored on the web as csv files; their URLs are already available as character strings in the sample code. 
 #You can load this data with the read_csv() method from the Pandas library.
 
+# Import the Pandas library
+ import pandas as pd
+
+# Load the train and test datasets to create two DataFrames
+train_url = "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.csv"
+train = pd.read_csv(train_url)
+
+test_url = "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv"
+test = pd.read_csv(test_url)
+
+#Print the `head` of the train and test dataframes
+print(train.head())
+print(test.head())
+
+#You can easily explore a DataFrame using the .describe() method. 
+test.describe()   #summarizes the columns/features of the DataFrame, including the count of observations, mean, max and so on. 
+
+#Another useful trick is to look at the dimensions of the DataFrame. 
+#This is done by requesting the .shape attribute of your DataFrame object. (ex. your_data.shape)
+
+#How many people in your training set survived the disaster with the Titanic? 
+#you can use the value_counts() method in combination with standard bracket notation to select a single column of a DataFrame:
+
+# absolute numbers for Passengers that survived vs passengers that passed away:
+surv = train["Survived"].value_counts()
+print(surv)
+
+# percentages
+surv_por= train["Survived"].value_counts(normalize = True)
+print(surv_por)
+
+#If you run these commands in the console, you'll see that 549 individuals died (62%) and 342 survived (38%).
+
+#To dive in a little deeper we can perform similar counts and percentage calculations on subsets of the Survived column. 
+#For example, maybe gender could play a role as well? 
+#You can explore this using the .value_counts() method for a two-way comparison on the number of males and females that survived:
+# Males that survived vs males that passed away
+ms = train["Survived"][train["Sex"] == 'male'].value_counts()
+print(ms)
+
+# Females that survived vs Females that passed away
+fs= train["Survived"][train["Sex"] == 'female'].value_counts()
+print(fs)
+
+#To get proportions, you can again pass in the argument normalize = True to the .value_counts() method.
+# Normalized male survival
+ms_por= train["Survived"][train["Sex"] == 'male'].value_counts(normalize = True)
+print(ms_por)
+
+# Normalized female survival
+fs_por= train["Survived"][train["Sex"] == 'female'].value_counts(normalize = True)
+print(fs_por)
+
+#Another variable that could influence survival is age; since it's probable that children were saved first. 
+#You can test this by creating a new column with a categorical variable Child. 
+#Child will take the value 1 in cases where age is less than 18, and a value of 0 in cases where age is greater than or equal to 18.
+
+#To add this new variable you need to do two things 
+#(i) create a new column, and 
+#(ii) provide the values for each observation (i.e., row) based on the age of the passenger.
+
+#Adding a new column with Pandas in Python is easy and can be done via the following syntax:
+
+your_data["new_var"] = 0
+#This code would create a new column in the train DataFrame titled new_var with 0 for each observation.
+
+#To set the values based on the age of the passenger, you make use of a boolean test inside the square bracket operator. 
+#With the []-operator you create a subset of rows and assign a value to a certain variable of that subset of observations. 
+
+train["new_var"][train["Fare"] > 10] = 1
+#would give a value of 1 to the variable new_var for the subset of passengers whose fares greater than 10. 
+#Remember that new_var has a value of 0 for all other values (including missing values).
+
+# Create the column Child and assign to 'NaN'
+train["Child"] = float('NaN')
+
+# Assign 1 to passengers under 18, 0 to those 18 or older. Print the new column.
+train["Child"][train["Age"] < 18] = 1
+train["Child"][train["Fare"] >= 18] = 0
+print(train["Child"])
+
+# Print normalized Survival Rates for passengers under 18
+print(train["Survived"][train["Child"] == 1].value_counts(normalize = True))
+
+# Print normalized Survival Rates for passengers 18 or older
+print(train["Survived"][train["Child"] == 0].value_counts(normalize = True))
+
+# first prediction: all females in the test set survive and all males in the test set die.
+
+#You use your test set for validating your predictions. 
+#You might have seen that contrary to the training set, the test set has no Survived column. 
+#You add such a column using your predicted values. 
+#Next, when uploading your results, Kaggle will use this variable (= your predictions) to score your performance.
+
+# Create a copy of test: test_one
+test_one = test
+
+# Initialize a Survived column to 0
+test_one["Survived"] = 0
+
+# Set Survived to 1 if Sex equals "female" and print the `Survived` column from `test_one`
+test_one["Survived"][test_one["Sex"] == "female"] = 1
+print(test_one["Survived"])
+
+##################################
+# Predicting with Decision Trees #
+##################################
+
+
+
 
