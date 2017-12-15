@@ -1,0 +1,15 @@
+
+idade = 12
+idade=input()
+idade
+'12'
+type(idade)
+<class 'str'>
+idade=int(input()) #força o input de string a integer
+idade
+12
+type(idade)
+<class 'int'>
+
+#   / divisão-> resultado float 2.0                        // divisão sem resto -> resultado integer 2
+
