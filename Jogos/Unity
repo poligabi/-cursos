@@ -15,16 +15,18 @@ public class Jogador : MonoBehaviour
             transform.Translate(Vector3.forward * Time.deltaTime * velocidade);
         
         }
-
-
-           
-   
+        //Esqueda
+        else if (Input.GetKey(KeyCode.A))
+        {
+            transform.Translate(Vector3.right * Time.deltaTime * velocidade);
+            transform.Rotate(0, -1 * velocidadeGiro, 0);
+  
         //Direita
-        //else if (Input.GetKey("Horizontal"))
-        //{
-        //    transform.Translate(Vector3.right * Input.GetAxis("Horizontal") * Time.deltaTime * velocidade);
-        //    transform.Rotate(0, 1 * velocidadeGiro, 0);
-        //}
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Translate(Vector3.right * Time.deltaTime * velocidade);
+            transform.Rotate(0, 1 * velocidadeGiro, 0);
+        }
         //Para trás
         else if (Input.GetKey(KeyCode.S))
             transform.Translate(Vector3.back * Time.deltaTime * velocidade);
