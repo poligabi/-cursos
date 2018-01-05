@@ -1,0 +1,54 @@
+public class Jogador : MonoBehaviour
+{
+
+    public float velocidade;
+    public float cameraSensibilidade;
+    public float velocidadeGiro;
+    // Update is called once per frame
+    void Update()
+    {
+       /// MovimentoMouse();
+
+        //Para frente 
+        if (Input.GetKey(KeyCode.W))
+        {
+            transform.Translate(Vector3.forward * Time.deltaTime * velocidade);
+        
+        }
+
+
+           
+   
+        //Direita
+        //else if (Input.GetKey("Horizontal"))
+        //{
+        //    transform.Translate(Vector3.right * Input.GetAxis("Horizontal") * Time.deltaTime * velocidade);
+        //    transform.Rotate(0, 1 * velocidadeGiro, 0);
+        //}
+        //Para trás
+        else if (Input.GetKey(KeyCode.S))
+            transform.Translate(Vector3.back * Time.deltaTime * velocidade);
+
+        //Para cima
+         else if (Input.GetKey(KeyCode.Space))
+            transform.Translate(Vector3.up * Time.deltaTime * velocidade);
+
+        // Para baixo
+         else if (Input.GetKey(KeyCode.V))
+            transform.Translate(Vector3.down * Time.deltaTime * velocidade);
+    }
+// Para mover em joystick:
+       float paraOsLados =  Input.GetAxis("Horizontal") * Time.deltaTime * velocidade;
+        float paraFrenteTras = Input.GetAxis("Vertical") * Time.deltaTime * velocidade;
+        transform.Translate(-paraOsLados, 0, paraFrenteTras); 
+
+// exemplo função:
+    void MovimentoMouse()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        Vector3 lookhere = new Vector3(-mouseY * cameraSensibilidade, 0, 0);
+        transform.Rotate(lookhere);
+       
+    }
+}
