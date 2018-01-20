@@ -13,3 +13,14 @@ type(idade)
 
 #   / divisão-> resultado float 2.0                        // divisão sem resto -> resultado integer 2
 
+def pontosM(areaM)
+    umPorcent = areaM / 100
+    pontos = umPorcent // 78.5   #area de um pontod amostral com 5m de raio é 78.5m2
+    return(pontos)
+  
+ def pontosKm(areaKm)
+    umPorcent = areaKm * 10       # *1000 p dar metros /100 pra dar 1%
+    pontos = umPorcent // 78.5
+    return(pontos)
+  
+
