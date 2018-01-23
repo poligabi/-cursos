@@ -28,30 +28,26 @@ def pontosM(r,areaM):
 
 ###Criando o GUI
                                       
-# Linkando GUI ao script para realizar a função 
-import simplekml
-import pandas
 import tkinder
-from tkinder.filedialog import askopenfilename
                                       
- def pontosM(r,areaM):
+def pontosM(r,areaM):
     pontos=(areaM*0.01)//(3.14*r*r)   
     return(pontos)
 
- def pontosKm(r,areaKm):    
-    pontos = areaKm*10 //(3.14*r*r)        # *1000 p dar metros /100 pra dar 1%
+def pontosKm(r,areaKm):    
+    pontos = areaKm*10 //(3.14*r*r)
     return(pontos)                                  
                  
 root=tkinder.Tk()          #inicia o GUI
 root.title("Pontos a amostrar por area")                #cria titulo da janela
 label=tkinder.Label(root,text="Definir quantidade de pontos que componham 1% da area")
 label.pack()                             #cria legenda
-browseButton=tkinder.Button(root,text="Area",command=input)
-browseButton.pack()                       #cria botão
-kmlButton=tkinder.Button(root,text="Gerar quando area em Metros",command=pontosM)
-kmlButton.pack()
-kmlButton=tkinder.Button(root,text="Gerar quando area em Kilometros",command=pontosKm)
-kmlButton.pack()
+areaButton=tkinder.Button(root,text="Area",command=input)
+areaButton.pack()                       #cria botão
+mButton=tkinder.Button(root,text="Quantia quando area (metros)",command=pontosM)
+mButton.pack()
+kmButton=tkinder.Button(root,text="Quantia quando area (Km)",command=pontosKm)
+kmButton.pack()
 root.mainloop()          #cria o GUI, tudo colocado entre ele e o inicio sao as caracteristicas add ao GUI
 
 
