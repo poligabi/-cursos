@@ -13,14 +13,50 @@ type(idade)
 
 #   / divisão-> resultado float 2.0                        // divisão sem resto -> resultado integer 2
 
-def pontosM(areaM)
-    umPorcent = areaM / 100
-    pontos = umPorcent // 78.5   #area de um pontod amostral com 5m de raio é 78.5m2
+## Script para definir quantidade de pontos que componham 1% da area
+
+def pontosM(r,areaM):
+    pontos=(areaM*0.01)//(3.14*r*r)   
     return(pontos)
-  
- def pontosKm(areaKm)
-    umPorcent = areaKm * 10       # *1000 p dar metros /100 pra dar 1%
-    pontos = umPorcent // 78.5
+    
+#area de um pontod amostral com 5m de raio é 78.5m2
+
+ def pontosKm(r,areaKm):    
+    pontos = areaKm*10 //(3.14*r*r)        # *1000 p dar metros /100 pra dar 1%
     return(pontos)
   
 
+###Criando o GUI
+                                      
+# Linkando GUI ao script para realizar a função 
+import simplekml
+import pandas
+import tkinder
+from tkinder.filedialog import askopenfilename
+                                      
+ def pontosM(r,areaM):
+    pontos=(areaM*0.01)//(3.14*r*r)   
+    return(pontos)
+
+ def pontosKm(r,areaKm):    
+    pontos = areaKm*10 //(3.14*r*r)        # *1000 p dar metros /100 pra dar 1%
+    return(pontos)                                  
+                 
+root=tkinder.Tk()          #inicia o GUI
+root.title("Pontos a amostrar por area")                #cria titulo da janela
+label=tkinder.Label(root,text="Definir quantidade de pontos que componham 1% da area")
+label.pack()                             #cria legenda
+browseButton=tkinder.Button(root,text="Area",command=input)
+browseButton.pack()                       #cria botão
+kmlButton=tkinder.Button(root,text="Gerar quando area em Metros",command=pontosM)
+kmlButton.pack()
+kmlButton=tkinder.Button(root,text="Gerar quando area em Kilometros",command=pontosKm)
+kmlButton.pack()
+root.mainloop()          #cria o GUI, tudo colocado entre ele e o inicio sao as caracteristicas add ao GUI
+
+
+
+# criar GUI .exe compartilhavel  (no promt de comando)                                       
+#abra arquivo do script no promt de comando
+pip intall pyinstaller 
+pyinstaller --onefile --windowed "nome do script.py" #cria pastas e dentro da dist deve estar seu .exe
