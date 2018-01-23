@@ -42,7 +42,7 @@ root=tkinder.Tk()          #inicia o GUI
 root.title("Pontos a amostrar por area")                #cria titulo da janela
 label=tkinder.Label(root,text="Definir quantidade de pontos que componham 1% da area")
 label.pack()                             #cria legenda
-areaButton=tkinder.Button(root,text="Area",command=input)
+areaButton=tkinder.Button(root,text="Area",command=input())
 areaButton.pack()                       #cria botão
 mButton=tkinder.Button(root,text="Quantia quando area (metros)",command=pontosM)
 mButton.pack()
