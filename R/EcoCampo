@@ -1,0 +1,340 @@
+
+
+
+################# Anova Fatorial - Formmigas ###########################
+
+setwd(choose.dir())
+
+dir()
+
+dados<-read.table("Formigas - Novateiro7.txt", h=T)
+
+attach(dados)
+dados
+summary(dados)
+
+##############################################
+
+library(car)
+
+a<-aov(Nformigas~Tratamento*Tempo+Individuo+Error(1/Individuo), dados)
+summary(a)
+
+b<-lmer(Nformigas~Tratamento+(1|Individuo/Tempo/Tratamento), dados)
+summary(b)
+
+##########################################################
+
+install.packages("sciplot")
+library(sciplot)
+lineplot.CI(Tempo,Nformigas,Tratamento)
+
+###################################################
+
+
+############### ANCOVA - Altura (tamanho da colonia)
+novdelt<- read.table(file = "clipboard", sep = "\t", header=TRUE, row.names=1)
+novdelt<- read.table(file.choose(),header=T)
+head(novdelt)
+plot(novdelt$delta~novdelt$Alt,pch=19,col=novdelt$Tratamento)
+
+
+ancov<-aov(novdelt$delta~novdelt$Alt*novdelt$Tratamento)
+summary(ancov)
+	#b são iguais pois não houve interação sig entre as variáveis, só nao sabemos valor (ainda)
+	#se o sexo não teve efeito sobre o resultado (nao sig) então o sexo não gerou diferenças nas retas logo "a" são iguais
+
+tf<-subset(novdelt,Tratamento=="fis")
+tq<-subset(novdelt,Tratamento=="quim")
+qf<-subset(novdelt,Tratamento=="fisqui")
+cq<-subset(novdelt,Tratamento=="contqui")
+rf<-(lm(tf$delta~tf$Alt))
+rq<-(lm(tq$delta~tq$Alt))
+summary(rf)		#encontra a e b de cada reta
+summary(rq)		#apesar dos numeros serem diferentes eles são estatisticamente iguais
+
+plot(novdelt$delta~novdelt$Alt,pch=19,col=novdelt$Tratamento,xlim=c(0,185),ylim=c(0,28))
+abline(rf,col=2)
+abline(rq,col=1)	#visualiza as retas (diferentes mas estatisticamente equivalentes
+
+plot(ancov$resid~ancov$fitted.values)
+abline(h=0,col=3)		#avaliar se resíduo esta normal
+shapiro.test(ancov$resid) #teste de normalidade (mas a analise grafica já resolve)
+
+
+############### ANCOVA - Distancia media (atividade da colonia)
+novdelt<- read.table(file = "clipboard", sep = "\t", header=TRUE, row.names=1)
+novdelt<- read.table(file.choose(),header=T)
+head(novdelt)
+plot(novdelt$delta~novdelt$Distmed,pch=19,col=novdelt$Tratamento)
+
+
+ancov<-aov(novdelt$delta~novdelt$Distmed*novdelt$Tratamento)
+summary(ancov)
+	#b são iguais pois não houve interação sig entre as variáveis, só nao sabemos valor (ainda)
+	#se o sexo não teve efeito sobre o resultado (nao sig) então o sexo não gerou diferenças nas retas logo "a" são iguais
+
+tf<-subset(novdelt,Tratamento=="fis")
+tq<-subset(novdelt,Tratamento=="quim")
+qf<-subset(novdelt,Tratamento=="fisqui")
+cq<-subset(novdelt,Tratamento=="contqui")
+rf<-(lm(tf$delta~tf$Distmed))
+rq<-(lm(tq$delta~tq$Distmed))
+summary(rf)		#encontra a e b de cada reta
+summary(rq)		#apesar dos numeros serem diferentes eles são estatisticamente iguais
+
+plot(novdelt$delta~novdelt$Alt,pch=19,col=novdelt$Tratamento,xlim=c(0,185),ylim=c(0,28))
+abline(rf,col=2)
+abline(rq,col=1)	#visualiza as retas (diferentes mas estatisticamente equivalentes
+
+plot(ancov$resid~ancov$fitted.values)
+abline(h=0,col=3)		#avaliar se resíduo esta normal
+shapiro.test(ancov$resid) #teste de normalidade (mas a analise grafica já resolve)
+
+
+
+
+#################################  PERMANOVA - DIVERSIDADE BETA - SCRIPT TIAGO #########################
+
+library(adespatial)
+library(betapart)
+library(vegan)
+
+fp <- read.table("biomas.txt", header=T, dec=",")
+
+perturb<-read.table("perturb.txt", header=F)
+amazonia<-read.table("tudo.txt", header=F)
+zeze <- factor(c(rep(1,46), rep(2,41)), labels = c("undisturbed","disturbed"))
+
+fp1<-as.matrix(fp)
+zeze1<-as.matrix(zeze)
+
+amazonia1<-as.matrix(amazonia)
+presamazonia<-ifelse(amazonia>0,1,0)###transforma em presença ausência
+presamazonia1<-as.matrix(presamazonia)
+
+
+#####as composições são diferentes?
+adonis(amazonia1~zeze1, permutations = 999)
+adonis(presamazonia1~zeze1, permutations = 999)
+
+
+
+#####Para comparar a dispersão - 
+
+presabs<-ifelse(amazonia>0,1,0)
+dist<-beta.pair(presabs, index.family="jaccard")
+dist[[3]]###Total Beta = diversidade beta, similaridade entre areas
+dist[[2]]###Aninhado = subgrupos
+dist[[1]]###Turnover beta = substituição de sp
+bd<-betadisper(dist[[2]],zeze)
+plot(bd)
+plot(bd, axes = c(1,2))
+boxplot(bd)
+anova(bd)###compara a disperçãoentre os dois grupos
+permutest(bd, pairwise = TRUE)###tb compara, mas é mais chique
+
+## Tukey's Honest Significant Differences (dá tra trabalhar com mais de um ambiente)
+(dispecao.HSD <- TukeyHSD(dist))
+plot(dispecao.HSD)
+
+
+###### Para ABUNDANCIA
+dist<-bray.part(amazonia)
+
+###Outra forma simplérrima
+
+beta.div.comp(fp, coef = "J", quant = TRUE, save.abc = FALSE)
+beta.div.comp(perturb, coef = "J", quant = TRUE, save.abc = FALSE)
+beta.div.comp(amazonia, coef = "J", quant = TRUE, save.abc = FALSE)
+
+prefp<-ifelse(fp>0,1,0)
+prama<-ifelse(amazonia>0,1,0)
+prpert<-ifelse(perturb>0,1,0)
+
+beta.div.comp(prefp, coef = "J", quant = TRUE, save.abc = FALSE)
+beta.div.comp(prpert, coef = "J", quant = TRUE, save.abc = FALSE)
+beta.div.comp(prama, coef = "J", quant = TRUE, save.abc = FALSE)
+
+##### script: Filipe ########
+#Comparação mata e área aberta, diversidade de formigas
+
+1° Abrir uma janela para escolher a pasta onde estão os scripts.
+setwd(choose.dir())
+
+2°Conferir os arquivos dentro da pasta.
+dir()
+
+update.packages()
+
+install.packages('vegan')
+install.packages(RVAideMemoire')
+library(RVAideMemoire) ### do demônio!!!!!!!!!!
+install.packages('betapart')
+install.packages('adespatial')
+
+
+library(betapart)
+library(adespatial)
+library(vegan)
+
+############################# Floresta ####################################
+
+3°Leitura dos dados
+
+PermFlo<-read.table("PermFlo.txt", h=T, sep="")
+PermFlo2<-read.table("PermFlo2.txt", h=T, sep="")
+
+
+#beta.core resumo deiversidade e riqueza
+
+PermFlo=PermFlo[,2:16]
+betapart.core(PermFlo)
+
+#calcula diversidade separando aninhamento
+
+beta.multi(PermFlo[,-1], index.family="sorensen")
+
+
+########### Permanova ################
+
+Completa.permanova=adonis(PermFlo2[,4:25]~Horas, data=PermFlo2,permutations=9999, method = "bray",)
+summary(Completa.permanova)
+
+
+
+presabs<-ifelse(amazonia>0,1,0)
+dist<-beta.pair(PermFlo2[,4:25], index.family="jaccard")
+dist[[3]]###Total Beta
+dist[[2]]###Aninhado
+dist[[1]]###Turnover beta
+bd<-betadisper(dist[[1]],banana)
+banana<-PermFlo2$Horas
+plot(bd)
+plot(bd, axes = c(1,2))
+boxplot(bd)
+
+
+##################################### Savana #######################################
+
+
+
+SavTot<-read.table("SavTot.txt", h=T, sep="")
+PermSav<-read.table("PermSav.txt", h=T, sep="")
+
+
+#beta.core resumo deiversidade e riqueza
+
+Savtot=SavTot[,2:8]
+betapart.core(SavTot)
+
+#calcula diversidade separando aninhamento
+
+beta.multi(SavTot[,-1], index.family="sorensen")
+
+
+########### Permanova ################
+
+Completa.permanova=adonis(PermSav[,4:10]~Horas, data=PermSav,permutations=9999, method = "bray",)
+summary(Completa.permanova)
+
+
+
+presabs<-ifelse(amazonia>0,1,0)
+dist<-beta.pair(PermSav[,4:10], index.family="jaccard")
+dist[[3]]###Total Beta
+dist[[2]]###Aninhado
+dist[[1]]###Turnover beta
+bd<-betadisper(dist[[1]],kiwi)
+kiwi<-PermSav$Horas
+plot(bd)
+plot(bd, axes = c(1,2))
+boxplot(bd)
+
+############################# GLMM #################################
+#inserindo dados#
+dados<-read.table(file.choose(), header=T)
+dados
+cor(dados$are_fc,dados$dur)
+
+library(glmm)
+help(glmm)
+
+data(dados)
+set.seed(1234) #fixa uma ordem, se não, cada resultado sera diferente
+
+mod.mcml1<-glmm(dur~herb+lux,list(dur~id),varcomps.names=c("id"),data=dados,
+family.glmm=poisson.glmm,m=10,doPQL=TRUE)
+#list: onde inserimos o efeito aleatorio (para bernoulli, q dados são 0 ou 1 
+##fica y~0+z1 variav y agrupada pela variav z1(aleatoria)iniciando no 0, na 
+##variavel contínua retira esse zero pois sera calculado automaticamente
+#m= repetições de montecarlo
+#efeito aleatorio = oq não queremos investigar mas estamos considerando (ex diferença d terreno, folhas do mesmo individuo...)
+
+mod.mcml1$beta
+mod.mcml1$nu
+summary(mod.mcml1)
+coef(mod.mcml1) 
+
+############################# Aves aquaticas ####################################
+
+
+espa<- read.table(file = "clipboard", sep = "\t", header=TRUE, row.names=1)
+spe<- read.table(file = "clipboard", sep = "\t", header=TRUE, row.names=1)
+
+plot(espa$X, espa$Y)
+
+library(vegan)
+
+# Add objeto riqueza de sp.
+riqueza<-specnumber(spe) #função do pacote q calcula riqueza através dos dados brutos
+
+## Grafico d riqueza de especies por unidadea amostral espacial:
+
+plot(espa$X, espa$Y, type="n",    
+xlab= "Coordenada X", ylab= "Coordenada Y", las=1) +
+lines(espa$X, espa$Y, col="blue4") +
+points(espa$X,espa$Y, cex=riqueza/3,pch=16, col="gray") +   #add círculos de riqueza (dividiu por 3.5 pois riqueza ficava muito grande no grafico)
+points(espa$X, espa$Y, cex=riqueza/3,pch=1) +   #add bordas, permite vermos as sobreposições dos círculos
+points(espa$X, espa$Y, cex=0.5, pch=16)   #add centros
+
+#### Diversidade Beta -> variação da diversidade entre pontos = oq interessa é a variação e o que a explica, não as espécies repetidas
+
+library(vegan)
+library(betapart)
+library(adespatial)
+
+aqua1<-read.table(file.choose(), header=T)
+str(aqua1)
+
+#beta.core=resumo diversidade e riqueza
+aqua1=aqua1[,2:18]	#so as colunas de espécies
+betapart.core(aqua1) # calcula entre todos os pontos locais de coleta
+
+#calcula diversidade separando aninhamento
+
+beta.multi(aqua1[,-1], index.family="sorensen")
+#SIM=turn over, substituição de espécies, muitas sp diferentes entre os pontos
+#SNE=aninhamento
+#SOR=diversidade Beta total
+
+########### Permanova ################
+
+aqua2<-read.table(file.choose(), header=T)
+str(aqua2)
+Completa.permanova=adonis(aqua2[,2:18]~Habitat, data=aqua2,permutations=9999, method = "bray",)
+summary(Completa.permanova)
+#aqua2[2:18] =colunas com as especies; Habitat =tratamento q quero comparar, podia ser categoria de horarios diferentes se quizesse fazer analise temporal
+Completa.permanova
+
+		presabs<-ifelse(amazonia>0,1,0)	# função p deixar dados 0/1
+dist<-beta.pair(aqua2[,2:18], index.family="jaccard")
+dist[[3]]###Total Beta
+dist[[2]]###Aninhado = sub-grupos
+dist[[1]]###Turnover beta = substituição de sp entre habitats
+banana<-aqua2$Habitat
+bd<-betadisper(dist[[1]],banana)
+plot(bd)
+plot(bd, axes = c(1,2))
+
+
