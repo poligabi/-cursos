@@ -1,0 +1,456 @@
+
+
+########### Crescimento Populacional ########
+
+t.vida<-read.table(file = "clipboard", sep = "\t", header=TRUE)
+edit(t.vida)
+t.vida
+
+#
+Ro<-sum(t.vida$lx*t.vida$bx)
+Ro	#Taxa reprodutiva liquida da geração/coorte
+T<-(sum(t.vida$id*t.vida$lx*t.vida$bx)/Ro)
+T	#Tempo de geração (idade q maioria das fêmeas esta contribuindo com reprodução)
+R<-exp(log(Ro)/T) )
+R	#taxa de crscimento discreto da população (cresce>1; diminui<1
+r<-log(R)	
+r	#taxa de crescimento continuo d população (cresce>0; diminui<0)
+
+
+#Matriz de leslie
+
+# http://ecovirtual.ib.usp.br/doku.php?id=ecovirt:roteiro:math:exponencialr
+
+
+##########################################
+# Ecologia das Populações	10.IV.2014 #
+#	Modelo Hierarquico de Ocorrência   #
+##########################################
+
+install.packages("unmarked")
+# https://cran.r-project.org/web/packages/unmarked/vignettes/unmarked.pdf
+library(unmarked)
+
+setwd(choose.dir()) #escolhe o diretório de trabalho
+
+#Add dados e crias objetos 
+pratica1<-read.table(file = "clipboard", sep = "\t", header=TRUE)
+str(pratica1)
+
+##Variáveis de
+###Detecção (vai influenciar se veremos o bicho ou não)
+observador<-pratica1[,4:6]
+hora<-pratica1[,7:9]
+clima<-pratica1[,13:15]
+
+###Ocorrência (influencia se o bicho efetivamente ocorre lá)
+pessoas<-pratica1[,10] 		#usar só 1 das 3 colunas
+arvore<-pratica1[,16]
+
+##Especies
+lagarto<-pratica1[,19:21]
+lagarto[lagarto>0] = 1
+pombo<-pratica1[,22:24]
+pombo[pombo>0] = 1
+cachorro<-pratica1[,25:27]
+cachorro[cachorro>0] = 1
+
+
+###Transformar arvore por ser o unico dado nao binominal ou categorico
+arvore.t<-scale(arvore) #escalona os numeros com media 0 e desvio 1 de modo que agora os numeros variam entre -1 e 1
+
+
+#### Modelagem para "lagarto"
+
+# Matriz de dados para analise
+umf.lagarto <- unmarkedFrameOccu(y =lagarto,
+			siteCovs = data.frame(pessoas=pessoas, arvore=arvore.t), 	#variaveis de ocorrencia/ocupação
+			obsCovs = list(observador=observador, hora=hora, clima=clima)) 	#variáveis de detecção/observação
+		###Nessa etapa se der erro de comprimento, busque os NA ausencia de dados q devem ser escritos na planilha ao invés deixar a celula em branco
+plot(umf.lagarto)
+summary(umf.lagarto)
+
+
+#Rodar modelos de detecção com ocorrencia fixa
+md0= occu(~1	 ~1, data=umf.lagarto,method="Nelder-Mead")  #modelo nulo, primeiro ~1 detecção, segundo ~1 ocorrencia (1 representa fixo)
+md1= occu(~observador ~1, data=umf.lagarto,method="Nelder-Mead")
+md2= occu(~hora ~1, data=umf.lagarto,method="Nelder-Mead")
+md3= occu(~clima ~1, data=umf.lagarto,method="Nelder-Mead")
+md0 #gera o estimate=psi, SE=erro-padrao, z, p, AIC
+md1	#maior estimate foi do observador q mais viu
+md2	
+md3
+
+##Comparar modelos
+modelo.lagarto<-fitList('md0 psi(.)p(.)' =md0,
+				#'md1 psi(.)p(.)' =md1,
+				'md2 psi(.)p(hora)' =md2,
+				'md3 psi(.)p(clima)'=md3)
+model.Lagarto<-modSel(modelo.lagarto) # l=L (nao um)
+model.Lagarto 		#menor AIC melhor variavel d detecção (no caso foi hora)
+
+
+### step 2 - rodar model final p estimar melhor variavel p ocorrencia
+md00 = occu(~hora       ~1,            data=umf.lagarto, method = "Nelder-Mead")
+md01 = occu(~hora       ~arvore,      data=umf.lagarto, method = "Nelder-Mead")
+md02 = occu(~hora       ~pessoas,      data=umf.lagarto, method = "Nelder-Mead")
+md00
+md01
+md02
+
+#Seleção de modelos
+modelo.L<-fitList('md00 psi(.)p(hora)' =md00,
+				'md01 psi(pessoas)p(hora)' =md01,
+				'md02 psi(arvore)p(hora)'=md02)
+modL<-modSel(modelo.L)
+modL
+
+#### Modelagem para "pombo"
+
+# Matriz de dados para analise
+umf.pombo <- unmarkedFrameOccu(y =pombo,
+			siteCovs = data.frame(pessoas=pessoas, arvore=arvore.t), 	#variaveis de ocorrencia/ocupação
+			obsCovs = list(observador=observador, hora=hora, clima=clima)) 	#variáveis de detecção/observação
+		###Nessa etapa se der erro de comprimento, busque os NA ausencia de dados q devem ser escritos na planilha ao invés deixar a celula em branco
+plot(umf.pombo)
+summary(umf.pombo)
+
+
+#Rodar modelos de detecção com ocorrencia fixa
+md0= occu(~1	 ~1, data=umf.pombo,method="Nelder-Mead")  #modelo nulo, primeiro ~1 detecção, segundo ~1 ocorrencia (1 representa fixo)
+md1= occu(~observador ~1, data=umf.pombo,method="Nelder-Mead")
+md2= occu(~hora ~1, data=umf.pombo,method="Nelder-Mead")
+md3= occu(~clima ~1, data=umf.pombo,method="Nelder-Mead")
+md0 #gera o estimate, SE=erro-padrao, z, p, AIC
+md1	#maior estimate foi do observador q mais viu
+md2
+md3
+
+##Comparar modelos
+modelo.pombo<-fitList('md0 psi(.)p(.)' =md0,
+				'md2 psi(.)p(hora)' =md2,
+				'md3 psi(.)p(clima)'=md3)
+model.Pombo<-modSel(modelo.pombo) # l=L (nao um)
+model.Pombo 		#menor AIC melhor variavel de detecção
+
+
+### step 2 - rodar model final p estimar melhor variavel p ocorrencia
+md00= occu(~hora ~1, data=umf.pombo,method="Nelder-Mead")
+md01= occu(~hora ~arvore, data=umf.pombo,method="Nelder-Mead")
+md02= occu(~hora ~pessoas, data=umf.pombo,method="Nelder-Mead")
+md00
+md01
+md02
+modelo.P<-fitList('md00 psi(.)p(hora)' =md00,
+				'md01 psi(pessoas)p(hora)' =md01,
+				'md02 psi(arvores)p(hora)'=md02)
+modL<-modSel(modelo.P)
+modL
+
+#### Modelagem para "cachorro"
+
+# Matriz de dados para analise
+umf.cachorro <- unmarkedFrameOccu(y =cachorro,
+			siteCovs = data.frame(pessoas=pessoas, arvore=arvore.t), 	#variaveis de ocorrencia/ocupação
+			obsCovs = list(observador=observador, hora=hora, clima=clima)) 	#variáveis de detecção/observação
+		###Nessa etapa se der erro de comprimento, busque os NA ausencia de dados q devem ser escritos na planilha ao invés deixar a celula em branco
+plot(umf.cachorro)
+summary(umf.cachorro)
+
+
+#Rodar modelos de detecção com ocorrencia fixa
+md0= occu(~1	 ~1, data=umf.cachorro,method="Nelder-Mead")  #modelo nulo, primeiro ~1 detecção, segundo ~1 ocorrencia (1 representa fixo)
+md1= occu(~observador ~1, data=umf.cachorro,method="Nelder-Mead")
+md2= occu(~hora ~1, data=umf.cachorro,method="Nelder-Mead")
+md3= occu(~clima ~1, data=umf.cachorro,method="Nelder-Mead")
+md0 #gera o estimate, SE=erro-padrao, z, p, AIC
+md1	#maior estimate foi do observador q mais viu
+md2
+md3
+
+##Comparar modelos
+modelo.cachorro<-fitList('md0 psi(.)p(.)' =md0,
+				#'md1 psi(.)p(observador)' =md1,
+				'md2 psi(.)p(hora)' =md2,
+				'md3 psi(.)p(clima)'=md3)
+model.Cachorro<-modSel(modelo.cachorro) # l=L (nao um)
+model.Cachorro 		#menor AIC melhor variavel d detecção (no caso foi hora)
+
+
+### step 2 - rodar model final p estimar melhor variavel p ocorrencia
+md00= occu(~hora ~1, data=umf.cachorro,method="Nelder-Mead")
+md01= occu(~hora ~arvores, data=umf.cachorro,method="Nelder-Mead")
+md02= occu(~hora ~pessoas, data=umf.cachorro,method="Nelder-Mead")
+md00
+md01
+md02
+modelo.C<-fitList('md00 psi(.)p(hora)' =md00,
+				'md01 psi(pessoas)p(hora)' =md01,
+				'md02 psi(arvores)p(hora)'=md02)
+modL<-modSel(modelo.C)
+modL
+
+
+##########################################
+# Ecologia de Populações	12.IV.2014 #
+#	Modelo Hierarquico de Abundancia   #
+##########################################
+
+library(unmarked)
+
+#Add dados e crias objetos 
+pratica2<-read.table(file = "clipboard", sep = "\t", header=TRUE)
+str(pratica2)
+
+##Variáveis de
+###Detecção (vai influenciar se veremos o bicho ou não)
+hora<-pratica2[,6:11]	#muito observador, dará erro de novo
+
+
+###Abundancia (influencia se o bicho efetivamente ocorre lá)
+setor<-pratica2[,1]		#usar só 1 coluna, pois variavel nao deveria mudar
+arvore<-scale(pratica2[,2])
+comida<-scale(pratica2[,3])	# Transformar por não ser dado binominal ou categorico
+#escalona os numeros com media 0 e desvio 1 de modo que agora os numeros variam entre -1 e 1
+
+##Especie: gato
+cont<-pratica2[,12:17] 
+
+###inserir dados na função
+## Matriz de dados para analise
+umf.gatos <- unmarkedFramePCount(y =cont,
+			siteCovs = data.frame(setor=setor, arvore=arvore, comida=comida), 	#variaveis de sitio/ da biologia da espécie
+			obsCovs = list(hora=hora)) 	#variáveis de detecção/observação		
+plot(umf.gatos)
+summary(umf.gatos)
+
+## Ajuste de modelos avaliando detecção
+fm0<-pcount(~1 ~1, umf.gatos, K=50) #K=numero de interacoes q ele pede
+fm0
+fm1<-pcount(~hora ~1, umf.gatos, K=50) 
+fm1
+#Abundancia: Estimate=abundancia estimada dos gatos na ufmt
+#Detection: Estimate=probabilidade geral de ocupação/detecção fm0=0.0135,fm1=-0.4976(Intercept)
+##o estimate da linha hora é usado para gerar grafico de probabilidade 
+plogis(-0.4976)  # transformar Estimates -> probabilidade, mostrar add o erro (SE)
+plogis(0.0135)
+
+## Grafico de probabilidade de detecção pela variável hora
+library(ggplot2)
+newData1 <- data.frame(hora=seq(1, 11,length.out=6))
+E.p <- predict(fm1, type="det", newdata=newData1, appendData=TRUE)
+
+qplot(E.p$hora, E.p$Predicted, data = E.p, 
+      geom = c("line"),margins = NULL, ylim=c(0,1))+
+  xlab ("Hora") +
+  ylab ("Probabilidade de Detecção"~(rho)) +
+  geom_ribbon(aes(E.p $hora, ymin = lower, ymax = upper), alpha = 0.1) +
+  theme_classic() +
+  theme(axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14))
+
+
+## Seleção de modelos
+models.det<-fitList("m0 lambda(.)p(.)" =fm0,
+			"m1 lambda(.)p(hora)" =fm1)
+modSel(models.det) 			#menor AIC melhor variavel d detecção 
+
+confint(fm1, type="det", level=0.95)	#intervalo de confiança
+
+
+## Ajuste de modelos avaliando a abundancia
+fm3<- pcount(~hora ~1, umf.gatos, K=50)
+fm4<- pcount(~hora ~setor, umf.gatos, K=50)
+fm5<- pcount(~hora ~comida, umf.gatos, K=50)
+fm6<- pcount(~hora ~arvore, umf.gatos, K=50)
+fm3
+fm4
+fm5
+fm6
+p3<- plogis(0.4976) 	#SE=0.2156
+p4<- plogis(1.324)	#SE=0.556
+p5<- plogis(2.41)		#SE=0.2108
+p6<- plogis(-0.5034) 	#SE=0.12
+
+## Seleção de modelos
+models.det<-fitList("m3 lambda(.)p(hora)" =fm3,
+			"m4 lambda(setor)p(hora)" =fm4,
+			"m5 lambda(comida)p(hora)" =fm5,
+			"m6 lambda(arvore)p(hora)" =fm6 )
+modSel(models.det) 
+
+confint(fm1, type="lambda", level=0.95)	#intervalo de confiança , erro->calculo manual
+est=
+ic=  # SE*1.96
+est-ic
+
+#Empirical Bayes estimation of random effects=Medias corrigidas
+(fm1re<-ranef(fm4)) 	#modelo que pondera por dia, dia não visto é corrigido pela probabilidade
+				#esse método de calcular a abundância média corrige a tendencia a centralização dos dados que vai homogeneizá-los	
+sum(bup(fm1re))	# Tamanho da pop estimado /Estimated population size
+
+# Grafico Empirical Bayes estimation of random effects
+(fm1re <- ranef(fm4))
+plot(fm1re, subset=site %in% 1:6, xlim=c(-1,100))
+
+##############Predação
+
+###Modelo Lotka-Volterra
+
+ppLV <- function(times,y, parms)
+  {
+   V<-y[1]
+   P<-y[2]
+   	with(as.list(parms),{
+   	dV.dt <- r* V -alfa * P * V
+   	dP.dt <- beta *alfa*P*V -q*P
+   	return(list(c(dV.dt,dP.dt)))
+   	})
+  } 
+
+parametros=c(alfa=0.01, r=0.5, beta=0.1, q=0.2)
+inic=c(V0=25,P0=5)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+install.packages("deSolve")
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(25,5 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+
+##1-Reduzir a amplitude dos ciclos
+
+##Aumentei os valores das populações e diminui a amplitudes do ciclo.
+
+
+parametros=c(alfa=0.01, r=0.5, beta=0.1, q=0.2)
+inic=c(V0=75,P0=15)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(75,15 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+##2- Modifique apenas os valores de r e de alfa numa mesma direção
+
+#Aumentei os dois paramentros.
+
+parametros=c(alfa=0.04, r=0.8, beta=0.1, q=0.2)
+inic=c(V0=75,P0=15)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(75,15 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+
+#Aumentei o alfa e diminuir o r
+
+parametros=c(alfa=0.04, r=0.2, beta=0.1, q=0.2)
+inic=c(V0=75,P0=15)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(75,15 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+#Aumentei o beta e o q r
+
+parametros=c(alfa=0.01, r=0.5, beta=0.4, q=0.6)
+inic=c(V0=75,P0=15)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(75,15 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+#Aumentei o beta e o diminui o q
+
+parametros=c(alfa=0.01, r=0.5, beta=0.5, q=0.1)
+inic=c(V0=75,P0=15)
+tempo=seq(0,100,by=0.1)
+par(mfrow=c(1,2))
+require(deSolve)
+vp.res1=ode(y=inic, times=tempo, func=ppLV, parms=parametros)
+matplot(tempo,(vp.res1[,2:3]), type="l", main= "Dinâmica Predador-Presa", ylab="Tamanho da População",xlim=c(0,100),ylim=c(0,1500))
+plot(vp.res1[,2], vp.res1[,3], type="l",main="Dinâmica Predador-Presa",  ylab="Predador", xlab="Presa",xlim=c(0,1500),ylim=c(0,200))
+points(75,15 , cex=1.5, pch=19) # definindo no gráfico o estado incial das populações
+abline(h=parametros["r"]/parametros["alfa"],lty=2)#isoclina horizontal(vítima)
+abline(v=parametros["q"]/(parametros["alfa"]*parametros["beta"]),lty=2)#isoclina #vertical(predador)
+
+
+#############################Exercício metapopulações##########################
+
+n<-5
+tmax<-5
+psi0<-0.1
+cln<-0.6
+ext<-0.4
+#### Chuva de propagulos ####
+
+chuvaprop<-function(n,tmax,psi0,cln,ext){
+  bolo<-array(0,dim=c(n,n,tmax))
+  bolo[,,1]<-sample(0:1,n^2,prob=c((1-psi0),psi0),replace=TRUE)
+  for(t in 2:tmax){
+    print(t)
+    bolo[,,t]<-ifelse(bolo[,,t-1]==0,
+                      as.numeric(runif(n^2)<cln),
+                      as.numeric(runif(n^2)>ext))
+  }
+  hpsi<-rep(0,tmax)
+  for(t in 1:tmax){
+    hpsi[t]<-sum(bolo[,,t]/(n^2))
+  }
+  plot(0:(tmax-1),hpsi,type="l",
+                       ylim=c(0,1),
+                       xlab="tempo(t)",
+                       ylab="ocupação (psi)")
+  abline(h=cln/(cln+ext),lty=2)
+  return(bolo)
+}
+chuvaprop(30,100,0.1,0.9,0.5)	#insere os parâmetros:n,tmax,psi0,cln,ext
+
+#### Colonização interna #####
+
+colint<-function(n,tmax,psi0,i,ext){
+  bolo<-array(0,dim=c(n,n,tmax))
+  bolo[,,1]<-sample(0:1,n^2,prob=c((1-psi0),psi0),replace=TRUE)
+  for(t in 2:tmax){
+    print(t)
+    bolo[,,t]<-ifelse(bolo[,,t-1]==0,
+                      as.numeric(runif(n^2)<(i*(sum(bolo[,,t-1])/(n^2)))),
+                      as.numeric(runif(n^2)>ext))
+  }
+  hpsi<-rep(0,tmax)
+  for(t in 1:tmax){
+    hpsi[t]<-sum(bolo[,,t]/(n^2))
+  }
+  plot(0:(tmax-1),hpsi,type="l",
+                       ylim=c(0,1),
+                       xlab="tempo(t)",
+                       ylab="ocupação (psi)")
+  abline(h=1-ext/i,lty=2)
+  return(bolo)
+}
+colint(50,100,0.1,0.8,0.5)	#insere os parâmetros:n,tmax,psi0,i,ext
+
