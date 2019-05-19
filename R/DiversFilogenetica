@@ -1,0 +1,170 @@
+############
+### Script aula pratica - Ecologia de Comunidades PPG Ecologia e Conservaco da Biodiversidade, 2019/1
+### Fabricius Domingos: 09/05/2019
+###########
+
+############
+# Carregando os pacotes necessarios (instalar os pacotes antes usando "install.packages")
+library(ape)
+library(phytools)
+library(Hmisc)
+library(geiger)
+library(PhyloMeasures)
+library(vegan)
+install.packages('picante', dependencies="Depends") #instala tbm pacote de associacao obrigatoria, se colocar =TRUE ele baixa muita coisa aleatoria tbm, sugestoes, com alguma ligacao com ele)
+library(picante)
+
+############
+# Vamos inicialmente calcular i­ndices de diversidade taxonomica, apenas para efeitos de demonstraÃ§Ã£o. Usaremos os dados disponi­veis no pacote vegan.
+data(BCI)
+?BCI
+head(BCI)
+?diversity
+Shannon <- diversity(BCI, index = "shannon")
+Shannon
+Simpson <- diversity(BCI, index = "simpson")
+Simpson
+# Calculando equitabilidade. J = H/log(S) 
+J <- Shannon/log(specnumber(BCI))
+J
+
+# Vamos usar varios i­ndices para ver qual local sao realmente mais diverso que o outro.
+?renyi
+# a funcao calcula as diversidades de Renyi. Os diferentes indices de diversidade descritos na literatura sÃ£o, cada um, casos especiais de Renyi.
+# Selecionando algumas comunidades para utilizarmos nos cÃ¡lculos. Se quiser fazer com comunidades aleatÃ³rias use k <- sample (nrow(BCI), 6)
+k <- c(3, 8, 10, 15, 18, 20)
+k
+R <- renyi(BCI[k,])
+plot(R)
+# Circulos sao os valores dos calculos para as diferentes comunidades, e as linhas tracejadas os extremos e mediana.
+# Teoricamente, uma comunidade so pode ser considerada mais diversa que outra se todas as suas diversidades de Renyi sao maiores.
+
+# Apenas para demonstrar maneiras de estudar diversidade em comunidades, 
+#abaixo fazemos uma rarefacao para estimar o numero esperado de especies nas comunidades. 
+#Isso eh feito atraves da reamostragem aleatoria da comunidade diversas vezes, 
+#e plotando o numero medio de especies encontradas em cada reamostragem aleatoria. 
+#O tamanho dessa reamostragem deve ser menor que o tamanho total da comunidade para que a riqueza rarefeita seja calculada.
+S <- specnumber(BCI) # Numero observado de especies
+Srar <- rarefy(BCI, sample = min(rowSums(BCI)))
+plot(S, Srar, xlab = "Numero observado de especies", ylab = "Numero rarefeito de especies")
+abline(0,1) # intercept = 0, slope = 1
+#a inclinacao seria 1 se o n sp. observadas fosse igual ao n sp. esperadas naquela comunidade (segundo a rarefacao).
+
+# Curva de rarefacao para cada comunidade separadamente. 
+#Reparem que pouqui­ssimas parecem atingir uma assi­ntota, o que demonstraria amostragem adequada no local, i.e., quase todas as especies da comunidade local teriam sido amostradas.
+rarecurve(BCI, step = 20, sample = min(rowSums(BCI), cex = 0.6))
+
+# Lembram-se que temos especies que talvez nao tenham sido amostradas na regiao (unseen). 
+#Podemos utilizar estimadores de diversidade para saber a diferenca entre a riqueza esperada e a riqueza observada, ou seja, o patrimonio regional de especies.
+# Riqueza extrapolada para todos os dados
+specpool(BCI)
+# Se essa estimativa do patrimonio se aproximar da verdade, obteri­amos o mesmo valor, por exemplo, para apenas a metade dos plots (e nao todos os 50)
+s <- sample(nrow(BCI), 25)
+specpool(BCI[s,])
+# Raramente isso sera verdade. O que so mostra que eh matematicamente difi­cil de estimar a quantidade de especies nao amostradas (unseen). 
+
+
+# E possi­vel estimar tambem o n de sp. nao amostradas (unseen) para cada local. 
+#Seria o mesmo que estimar o "patrimonio local" ou, como fizemos acima, a riqueza esperada. 
+#Isso eh feito basicamente usando os mesmos calculos, mas ao inves de contagem de sp. usamos de indivi­duos, 
+#e sp. raras corresponderiam a sp. de baixa frequencia no patrimonio regional. 
+estimateR(BCI[23,])
+
+
+
+
+############
+# Agora vamos brincar de diversidade filogenetica.
+# Para facilitar, vamos utilizar os exemplos do pacote picante. Ele Ã© desenvolvido, entre outros autores, pelo Webb e Ackerly (autores dos artigos que temos lido). 
+data(phylocom)
+phylo <- phylocom$phylo
+comunidade <- phylocom$sample
+phylo
+plot(phylo)
+comunidade
+# Os dados de comunidade sao organizados da mesma forma que no vegan. O vegan Ã© a base para tudo de ecologia no R, assim como o ape Ã© a base para tudo de filogenia.
+# Esses dados do picante sao exatamente organizados para este tipo de atividade, i.e., sao teÃ³ricos e didÃ¡ticos, entÃ£o as diferenÃ§as ficam mais evidentes.
+# Reparem que, logicamente, os nomes das espÃ©cies no conjunto de dados da filogenia e da comunidade devem ser idÃªnticos.
+diversity(comunidade, index = "shannon")
+diversity(comunidade, index = "simpson")
+plot(renyi(comunidade))
+specpool(comunidade)
+
+### Quais sao as comunidades mais diversas?
+
+phylo_separada <- prune.sample(comunidade, phylo)
+phylo_separada
+
+par(mfrow = c(2, 3))
+ for (i in row.names(comunidade)) { 
+ 	plot(phylo_separada, show.tip.label = FALSE, main = i)
+ 	tiplabels(tip = which(phylo_separada$tip.label %in% names(which(comunidade [i, ] > 0))), 
+ 	pch=19, cex=2) }
+
+### Observando essa figura, e considerando o resultado dos calculos de diversidade que acabamos de fazer, 
+#o que voces podem prever acerca da diversidade filogenetica de cada comunidade? 
+#A diversidade filogenetica estara correlacionada com a diversidade de sp.? 
+#Nao,o clump1 e even, e o clump2 e clump4 tem =valores de diversidade d sp. 
+#mas olhando as arvores o even e o clump4 tem muito mais diversidade filogenetica
+
+# Diversidade Phyllogenetic = soma de todos os comprimentos de ramo considerando as especies presentes na comunidade.
+?pd
+resultado_pd <- pd(comunidade, phylo, include.root = T)
+resultado_pd
+
+
+# Como conversamos em sala de aula ontem, existem outras maneiras de investigar diversidade filogenetica, 
+#por exemplo com metricas que calculam quao proximamente relacionadas cada par de sp. em uma comunidade sao, em media. 
+#MPD = mean pairwise distance, MNTD = mean nearest taxon distance. Estas metricas sao calculadas com base em matrizes de distancia e nao dos comprimentos dos ramos em si.
+# Uma abordagem comum eh comparar tais metricas com a distancia esperada segundo um modelo nulo no qual nao houvesse nenhuma estrutura filogenetica na comunidade.
+phydist <- cophenetic(phylo) #cria a matriz de distancia
+phydist #quantidade d ramos entre 2 sp. = distancia genetica
+?ses.mpd
+resultado_mpd <- ses.mpd(comunidade, phydist, null.model = "taxa.labels", abundance.weighted = F, runs = 99)
+resultado_mpd
+# mpd.obs: MPD observado
+# mpd.rand.mean: Media do MPD na comunidade nula
+# mpd.obs.rank: Ranking do MPD observado vs. comunidade nula
+# mpd.obs.z: Tamanho do fenomeno (effect size) do MPD vs. comunidade nula
+# mpd.obs.p: Valor de p do MPD vs. comunidade nula
+# Valores positivos (mpd.obs.z, mpd.obs.p) indicam equitabilidade filogenetica (phylogenetic evenness)= maior distancia filogenetica entre os membros da comunidade local do que esperado ao acaso (Segundo o modelo nulo).
+
+### Como esse resultado esta relacionado com o que calculamos antes de diversidade filogenetica (PD)?
+resultado_pd
+
+resultado_mntd <- ses.mntd(comunidade, phydist, null.model="taxa.labels", abundance.weighted=FALSE, runs=99)
+resultado_mntd 
+# MPD eh mais sensi­vel aos padroes da arvore como um todo, de agrupamento e distribuicao das sp., enquanto MNTD eh mais sensi­vel aos padroes proximos aos taxons terminais. Vejam clump4.
+# Caso o pesquisador possua dados de abundancia (comum em fitossociologia por exemplo), Ã© possi­vel incorpora-los nos calculos (abundance.weighted). 
+#O calculo troca de distancia filogenetica media entre as sp., para distancia filogenetica media entre os indivi­duos.
+
+# Para entendermos melhor a diferenca entre estas tres metricas, vamos ver dar uma olhada na funcao matematica de cada uma delas usando outro pacote. 
+#Momento (moments) Ã© uma medida quantitativa do formato da funcao matematica usada para o calculo.
+library(PhyloMeasures)
+
+data(bird.families)
+bird.families
+plot(bird.families)
+
+richness <- 2:100
+mpdMom <- mpd.moments(bird.families,richness)
+mntdMom <- mntd.moments(bird.families,richness)
+pdMom <- pd.moments(bird.families,richness)
+
+# Plotando a mÃ©dia e desvio padrÃ£o
+par(mfrow = c(1,3))
+plot(richness,mpdMom[,1],type = "l",xlab = "Riqueza",ylab = "MPD")
+points(richness,mpdMom[,1]+mpdMom[,2],type = "l",col = "grey")
+points(richness,mpdMom[,1]-mpdMom[,2],type = "l",col = "grey")
+
+plot(richness,mntdMom[,1],type = "l",xlab = "Riqueza",ylab = "MNTD")
+points(richness,mntdMom[,1]+mntdMom[,2],type = "l",col = "grey")
+points(richness,mntdMom[,1]-mntdMom[,2],type = "l",col = "grey")
+
+plot(richness,pdMom[,1],type = "l",xlab = "Riqueza",ylab = "PD")
+points(richness,pdMom[,1]+pdMom[,2],type = "l",col = "grey")
+points(richness,pdMom[,1]-pdMom[,2],type = "l",col = "grey")
+
+### O que esses graficos nos revelam sobre as diferentes metricas? 2 minutos para conversar com o colega ao lado!
+#+riqueza +Phyllogenetic Diversity
+#MPD calcula distancia par a par e tende a constante com + riqueza
