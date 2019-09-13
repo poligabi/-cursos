@@ -1,46 +1,60 @@
+Curso SIG Geosemfronteiras julho e setembro 2019
 
-Add Imagem Satelite
-Complemento->QuickMapServices
-Web->quickmapservices->settings->more services -> get contributed pack (add ate imagens do google)
+### Add Imagem Satelite
+	Complemento->QuickMapServices
+	Web->quickmapservices->settings->more services -> get contributed pack (add ate imagens do google)
 
 Download d vetores oficiaisBR
- buscar google: shapefile IBGE -> link: mapas.ibge.gov.br/bases-e-referenciais/bases-cartograficas/malhas-digitais.html ->seleciona ultimo ano -> Brasil->BR-> br_unidades_da_federacao -> descompacta -> baixa o pdf p saber oq cada coisa
+ buscar google: shapefile IBGE 
+ 	-> link: mapas.ibge.gov.br/bases-e-referenciais/bases-cartograficas/malhas-digitais.html 
+	->seleciona ultimo ano -> Brasil ->BR-> br_unidades_da_federacao -> descompacta -> baixa o pdf p saber oq cada coisa
 
 
-organizar arquivos->tenha pastas diferentes:
+### Organizar arquivos->tenha pastas diferentes:
 -temp: p arquivos originais baixados; 
 -SIG: p arquivos convertidos
 
-Gerenciamento de vetores+ -> Vetor+ -> seleciona arquivo
+	Gerenciamento de vetores+ -> Vetor+ -> seleciona arquivo
 
-Projetos->Propiedades->SRC
-botao dir na camada -> Propriedades-> Fontes -> SRC
+	Projetos->Propiedades->SRC
+	botao dir na camada -> Propriedades-> Fontes -> SRC
 
-prj2epsg.org ->coloca o código e ele converte no SRC -> clica e aparece mais info: metadados, se é spheroid, dregrees...
+	prj2epsg.org ->coloca o código e ele converte no SRC -> clica e aparece mais info: metadados, se é spheroid, dregrees...
 
 .dbf=tabela d attributos ->podes abrir no excel (abrir: todos os arquivos)
 .prj=info sobre SRC
 .shp=geometrias
 
-bot direito->exportar->save feature as->nomeie a nova camada
+	bot direito->exportar->save feature as->nomeie a nova camada
 
-i ->id feiçoes -> x abrir automaticamente formulario: aparece janela pop-up (opcional)
+	i ->id feiçoes -> x abrir automaticamente formulario: aparece janela pop-up (opcional)
 
 Reprojetar camada p SRC de interesse:
-processar->caixa de ferramentas -> busca:reprojetar -> reprojetar camada ->selecionar camada com SRC diferente -> deixe desmarcado a parte de feições selecionadas, ou ele só mudara SRC dessas feições ->SRC destino:para oq queres reprojetar-> (Reprojetar: save as ->coloque outro nome na pasta ->) run in background
-se nao () faca isso: bot direito->exportar->save feature as->nomeia a nova camada na pasta
+	Processar->caixa de ferramentas -> busca:reprojetar -> 
+	Reprojetar camada -> selecionar camada com SRC diferente 
+	-> deixe desmarcado a parte de feições selecionadas, ou ele só mudara SRC dessas feições 
+	->SRC destino:para oq queres reprojetar-> (Reprojetar: save as ->coloque outro nome na pasta ->) run in background
+	se nao () faca isso: bot direito-> exportar -> save feature as ->nomeia a nova camada na pasta
 
-add camada satelite depois da vetorial -> não abre
+	add camada satelite depois da vetorial -> não abre
 
 Reprojeção de Camadas Vetoriais em Lote: 
 =ferramente q possibilita conversao SRC d varias camadas de uma vez
-->Remova e adicione todas de novo 
--> va p pasta com todas as camadas e copie o caminho dela C:\QGIS\...
--> QGIS-> gerenciador de fontes de dados livres ->vetor ->...-> cola o caminho na janela aberta (ou va selecionando pasta ate la)-> tipo de arquivo: .SHP-> selecione-> Adicionar
-->Processar-> caixa de ferramentas-> digite: reprojetar-> Reprojetar camada->Run as batch process -> Processamento em lote -> ...-> Selecionar do Open Layers (no Qgis, do file é buscar no windows explorer) -> selecione as camadas-> selecione SRC destino em cada -> Reprojetado ...=onde camadas serao salvas, coloque o tipo shapefile->nas seguinte podes simplesmente copiar e colar o caminho (sem ter q clicar em ...) -> Run in Background (executa) -> Ok Close
+	->Remova e adicione todas de novo 
+	-> va p pasta com todas as camadas e copie o caminho dela C:\QGIS\...
+	-> QGIS-> gerenciador de fontes de dados livres 
+	->vetor ->...-> cola o caminho na janela aberta (ou va selecionando pasta ate la)
+	-> tipo de arquivo: .SHP-> selecione-> Adicionar
+	->Processar-> caixa de ferramentas-> digite: reprojetar
+	-> Reprojetar camada->Run as batch process 
+	-> Processamento em lote -> ...-> Selecionar do Open Layers (no Qgis, do file é buscar no windows explorer) 
+	-> selecione as camadas-> selecione SRC destino em cada 
+	-> Reprojetado ...=onde camadas serao salvas, coloque o tipo shapefile
+	->nas seguinte podes simplesmente copiar e colar o caminho (sem ter q clicar em ...) 
+	-> Run in Background (executa) -> Ok Close
 
 Add camadas já modificadas em grupo:
-->selecione camadas -> botão direito -> Agrupar selecionadas
+	->selecione camadas -> botão direito -> Agrupar selecionadas
 
 Ferramentas de seleção de feições:
 -Feição: deixa selecionada a camada de interesse -> clique na feição q queres selecionar ->+Shift: podes selecionar +de 1
@@ -49,41 +63,52 @@ Ferramentas de seleção de feições:
 -Feição por raio: clique e no canto direito aparece o raio da seleção
 
 Seleção por expressão:
-->Tabela de atributos -> Selecionar feições pela expressão ->eCampos e valores->coluna que tem sua info->2cliques(seleciona)->digite: ='info' ->Selecionar feições
+	->Tabela de atributos -> Selecionar feições pela expressão 
+	->eCampos e valores->coluna que tem sua info->2cliques(seleciona)->digite: ='info' ->Selecionar feições
 
 Exportar feição selecionada p nova camada:
-->botão direito-> Exportar->...:escolhe o caminho q sera salvo e nomeie -> Codificação: x salvar somente feições selecionadas ->OK
+	->botão direito-> Exportar->...:escolhe o caminho q sera salvo e nomeie 
+	-> Codificação: x salvar somente feições selecionadas ->OK
 
 Só o contorno do polígono:
-->Propriedades->simbologia->Preenchimento-> simple fill-> cor do preenchimento=transparente -> cor do traço -> +largura->OK
+	->Propriedades->simbologia->Preenchimento-> simple fill
+	-> cor do preenchimento=transparente -> cor do traço -> +largura->OK
 
 Seleçao por localização:
 =cria seleção em camada baseado em relacionamento espacial
-->Selecione o Estado de interesse (ferramenta de seleconar feição)->exporte e salva a camada (crie a camada nova do local/mascara)
-->clique na camada q queres fazer a seleção por localização (rodovias do brasil e queres a do estado) -> Vetor -> Investigar -> Selecionar por localização -> Selecionar feição: rodovias -> x are within -> By comparing in the: estado -> Criar nova seleção -> Executar
-->botão direito -> Exportar -> Save features as -> x salvar somente feições selecionadas
+	->Selecione o Estado de interesse (ferramenta de seleconar feição)
+	->exporte e salva a camada (crie a camada nova do local/mascara)
+	->clique na camada q queres fazer a seleção por localização (rodovias do brasil e queres a do estado) 
+	-> Vetor -> Investigar -> Selecionar por localização -> Selecionar feição: rodovias 
+	-> x are within -> By comparing in the: estado -> Criar nova seleção -> Executar
+	->botão direito -> Exportar -> Save features as -> x salvar somente feições selecionadas
 
 Simbologia categorizada:
-camada -> 2cliques ou botao dir.propriedades -> Simbologia ->single symble->categorizado: seleciona coluna
--> podes alterar individualmente -> 2cliques na camada no grupo criado pelas categorias 
+	camada -> 2cliques ou botao dir.propriedades -> Simbologia ->single symble->categorizado: seleciona coluna
+	-> podes alterar individualmente -> 2cliques na camada no grupo criado pelas categorias 
 Poligono:
--> Preenchimento -> Simple fill-> Tranparente -> Cor do traço (destaque o de interesse) ->Largura do traço (tenha espessura padrão)
-Podes ver outras opções de simbologia tbm embaixo-> Simbolos em: -> ex:rachurado
+	-> Preenchimento -> Simple fill-> Tranparente -> Cor do traço (destaque o de interesse) 
+	->Largura do traço (tenha espessura padrão)
+	Podes ver outras opções de simbologia tbm embaixo-> Simbolos em: -> ex:rachurado
 Vetores:
-Propriedades-> Simbologia -> Simbolos em: varias opções -> Simbolos +elaborados= SVG (formato q podes baixar do google pra cá)
+	Propriedades-> Simbologia -> Simbolos em: varias opções 
+	-> Simbolos +elaborados= SVG (formato q podes baixar do google pra cá)
 
 Salvar Estilo em QML:
 =permite compartilhar simbologias com colegas de trabalhos
-->botao dir. na camada -> Exportar -> Save as QGIS layer style file -> nome do arquivo = nome da camada a q ele pertence (p facilitar id)
-Quando readd a camada -> Propriedades -> Simbologia -> Renderização da Camada: Estilo: Carregar Estilo ->selecione onde salvastes
+	->botao dir. na camada -> Exportar 
+	-> Save as QGIS layer style file -> nome do arquivo = nome da camada a q ele pertence (p facilitar id)
+	Quando readd a camada -> Propriedades -> Simbologia 
+	-> Renderização da Camada: Estilo: Carregar Estilo ->selecione onde salvastes
 
 Salvar Estilo em Galerias:
 =salva na janela de propriedade do QGIS 
-->Preenchimento -> simple fill:cria a simbologia -> Preenchimento -> Salvar simbolo -> nomeie, x add aos favoritos e salve
+	->Preenchimento -> simple fill:cria a simbologia -
+	> Preenchimento -> Salvar simbolo -> nomeie, x add aos favoritos e salve
 
-Projeto -> layout manager ->transportar info p mapa
+	Projeto -> layout manager ->transportar info p mapa
 
-	Laudo de Vegetação e APP
+Laudo de Vegetação e APP
 Antes do Campo:
 1-Área de Intervenção (coloca limites no tablet de campo)
 2- Cursos d'água (carta topografica com nascentes e afins da area e do entorno e os limites da APP)
@@ -103,77 +128,112 @@ Relatório (info obtida em campo
 
 
 
-Partição exclusiva p guardar dados -> ocorrer  problema no sistema operacional podes formatar o disco q os dados ficarão em partição secundária:
-Botão direito no icone do windowa -> gerenciador de disco -> botão direito no (C:) -> Diminuir volume -> diz tamanho que ele pode oferecer p essa partição
+Partição exclusiva p guardar dados 
+=ocorrer  problema no sistema operacional podes formatar o disco q os dados ficarão em partição secundária:
+	Botão direito no icone do windows -> gerenciador de disco 
+	-> botão direito no (C:) -> Diminuir volume -> diz tamanho que ele pode oferecer p essa partição
 
 site: geosemfronteira -> Dados: links oficiais p dados geograficos
 
 qgis3.4
-web->quickmapservice->google->satelite
-projeto->propriedades->SRC
+	web->quickmapservice->google->satelite
+	projeto->propriedades->SRC
 
-Add camada vetorial p localizar espacialmente: ex: ibge ou outros link q forneça camadas do estado/municipio -> limite estadual/municipal -> confere SRC -> Salvar como...-> pasta dos arquivos editaveis -> remove o shp original
+	Add camada vetorial p localizar espacialmente: ex: ibge ou outros link q forneça camadas do estado/municipio 
+	-> limite estadual/municipal -> confere SRC -> Salvar como...-> pasta dos arquivos editaveis -> remove o shp original
 
-id area de estudo: Botão direito na camada-> propriedades-> simbologia-> preenchimento simples -> cor do preenchimento= transparente
+id area de estudo: 
+	Botão direito na camada-> propriedades-> simbologia-> preenchimento simples -> cor do preenchimento= transparente
 
 Regras topologicas:
 -camadas q representam limites devem ter suas linhas sobrepostas
 
-Add camada -> raster -> seleciona arquivo TIFF (=ortofoto) ->+qualidade q sateçite google
+	Add camada -> raster -> seleciona arquivo TIFF (=ortofoto) ->+qualidade q satelite google
 
-Arquivo CAD (DWG=empresa proprietaria DGN=livre) ->extençao de arquivo criado em AutoCAD (usado por arquitetos)
+Arquivo CAD (DWG=empresa proprietaria DGN=livre) 
+=extençao de arquivo criado em AutoCAD (usado por arquitetos)
 
-Projeto-> importar/exportar-> importar camada DWG/DX0 -> seleciona onde vai salvar primeiro (fica com extenção .gpkg) -> define SRC-> selciona arquivo DWG -> permite arquivos separados dentro dele, então precisas dar um nome p grupo pra q transforme os vetores em 1 unico arquivo -> OK
-Converta de .gpkg p .shp -> Botão direito na camada (nao no nome do grupo) -> salvar camada vetorial como -> agora podes tirar esse arquivo do grupo e remover o .gpkg
+	Projeto-> importar/exportar-> importar camada DWG/DX0 
+	-> seleciona onde vai salvar primeiro (fica com extenção .gpkg) 
+	-> define SRC-> selciona arquivo DWG -> permite arquivos separados dentro dele
+	-> então precisas dar um nome p grupo pra q transforme os vetores em 1 unico arquivo -> OK
+Converta de .gpkg p .shp 
+	-> Botão direito na camada (nao no nome do grupo) -> salvar camada vetorial como 
+	-> agora podes tirar esse arquivo do grupo e remover o .gpkg
 
 IBGE-> possui banco de dados com cartas topograficas = DGN
 limitações: unidades de medidas em Km nao em metros
-nao tem projeção definida
-usa sist planar de coordenadas (x y)
-ausencia de elevação nas votas nos arquivos (valores sao inseridos)
-feiçoes q representam isolinhas sao partes simples (não multipartes)
+-nao tem projeção definida
+-usa sist planar de coordenadas (x y)
+-ausencia de elevação nas votas nos arquivos (valores sao inseridos)
+-feiçoes q representam isolinhas sao partes simples (não multipartes)
 
-ibge-> cartas cartograficas -> folhas topograficas -> vetoriais ->escala -> projeto conv digital -> varias areas -> doc (organização dos arquivos vetoriais = metadados) -> vetor (baixe de acordo com metadados)
+	ibge-> cartas cartograficas -> folhas topograficas -> vetoriais ->escala -> projeto conv digital 
+	-> varias areas -> doc (organização dos arquivos vetoriais = metadados) -> vetor (baixe de acordo com metadados)
 
-Camada-> add camada -> vetorial -> selecione arquivo dgn -> selecionar tudo
-clique botao direito encima do grupo -> se aproximar camada vc não consegue localizar por contar daquelas limitaçoes, por isso precisas referenciar ->
+	Camada-> add camada -> vetorial -> selecione arquivo dgn -> selecionar tudo
+	clique botao direito encima do grupo 
+	-> se aproximar camada vc não consegue localizar por contar daquelas limitaçoes, por isso precisas referenciar ->
 
-Abra Novo projeto -> Camada-> add camada -> vetorial -> selecione arquivo dgn -> ai voce consegue visualizar pois nao teve conflito entre os sistemas de coordenadas
+	Abra Novo projeto -> Camada-> add camada -> vetorial 
+	-> selecione arquivo dgn -> ai voce consegue visualizar pois nao teve conflito entre os sistemas de coordenadas
 
-osgeo4w -> aplicacao do QGIS q parece um prompt de comando -> inserir onde encontra o arquivo pelo comando: 
-cd C:\projetos\pasta_dos_arquivos
+osgeo4w = aplicacao do QGIS q parece um prompt de comando -> inserir onde encontra o arquivo pelo comando: 
+	cd C:\projetos\pasta_dos_arquivos
 
--> inserir comando p converter .dng em camada ponto/linha no formato .shp:
+	-> inserir comando p converter .dng em camada ponto/linha no formato .shp:
 Feiçao de Pontos
-ogr2ogr -f "ESRI Shapefile" -where "OGR_GEOMETRY='Point'" -skipfailures convertido_pontos.shp arquivo.dgn
+	ogr2ogr -f "ESRI Shapefile" -where "OGR_GEOMETRY='Point'" -skipfailures convertido_pontos.shp arquivo.dgn
 
 Feicao de Linhas
-ogr2ogr -f "ESRI Shapefile" -where "OGR_GEOMETRY='LineString'" -skipfailures convertido_linhas.shp arquivo.dgn
-->ai aparece na pasta 
+	ogr2ogr -f "ESRI Shapefile" -where "OGR_GEOMETRY='LineString'" -skipfailures convertido_linhas.shp arquivo.dgn
+	->ai aparece na pasta 
 
-Configurações -> Projeçoes personalisadas -> + -> Copiar parâmetros SRC existentes -> abre nova janela e você seleciona o SRC -> nos parâmetros as unidades aparecem em metros, então precisas deixar units=km, e modifica o nome para saberes no futuro -> Ok -> Agora define SRC do projeto e escolha este q criastes
-Camada-> add camada -> vetorial -> selecione arquivo convertido .shp -> ainda nao aparecer nada -> clica com botão direito na camada -> Fonte -> defina SRC q criastes
+	Configurações -> Projeçoes personalisadas -> + -> Copiar parâmetros SRC existentes 
+	-> abre nova janela e você seleciona o SRC 
+	-> nos parâmetros as unidades aparecem em metros, então deixe units=km, modifique nome para saberes no futuro 
+	-> Ok -> Agora define SRC do projeto e escolha este q criastes
+	Camada-> add camada -> vetorial -> selecione arquivo convertido .shp 
+	-> ainda nao aparecer nada -> clica com botão direito na camada -> Fonte -> defina SRC q criastes
 ->por enquanto SRC esta salvo apenas de forma arbritaria, mas p poder passar p outra pessoa precisas salvar de verdade:
-clica com botão direito -> exportar -> salvar feições como
+	clica com botão direito -> exportar -> salvar feições como
 
 agora converter .dgn de Km para Metros:
-Processar -> caixa de ferramentas -> Busca:  reprojetar camada -> Parâmetro: camada de entrada(coordenada km), SRC destino(q trabalharas, ex: sirgas2000), Reprojetado(onde arquivo sera salvo) -> independente do nome q destes aparece com o nome Reprojetado
+	Processar -> caixa de ferramentas -> Busca:  reprojetar camada 
+	-> Parâmetro: camada de entrada(coordenada km), 
+		SRC destino(q trabalharas, ex: sirgas2000), Reprojetado(onde arquivo sera salvo) 
+	-> independente do nome q destes aparece com o nome Reprojetado
 
 Georreferenciar info dos mapas:
 .pdf -> .jpg ou .png(+qualidade)
-imprimir -> pdf creator (baixar esse software p fazer essas conversões) -> salva na vertical (só girar nao salva) -> abra no paint para salvar na orientação adequada
-Raster-> Georreferenciador -> abre janela -> abrir imagem+ -> selecione a figura .png -> precisas indicar pontos de controle
+	imprimir -> pdf creator (baixar esse software p fazer essas conversões) 
+	-> salva na vertical (só girar nao salva) -> abra no paint para salvar na orientação adequada
+	Raster-> Georreferenciador -> abre janela 
+	-> abrir imagem+ -> selecione a figura .png -> precisas indicar pontos de controle
 
 primeiro vamos configurar a ferramenta georreferenciadora:
-Opções->configurações de transformação -> tipo de transformação:polinomial1/ metodo de amostragem:cubico/ SRC da area de estudo/ Configuracoes de saida: onde sera salvo (so aceita .tiff)
+	Opções-> configurações de transformação 
+		tipo de transformação:polinomial1 
+		metodo de amostragem:cubico
+		SRC da area de estudo
+		Configuracoes de saida: onde sera salvo (so aceita .tiff)
 
 Volta p janela georreferenciador
-->Adicionar ponto -> busque e clique num ponto facil de referenciar -> nao sabemos coord d cabeça -> a partir do mapa na tela -> clique no mesmo item -> ok ->+pontos= +qualidade
-Opções->configurar georrefenrenciador -> deixar 'mostrar IDs' marcado (p veres o rotulo)
+	->Adicionar ponto -> busque e clique num ponto facil de referenciar 
+	-> nao sabemos coord d cabeça -> 'a partir do mapa na tela' -> clique no mesmo item -> ok ->+pontos= +qualidade
+	Opções->configurar georrefenrenciador -> deixar 'mostrar IDs' marcado (p veres o rotulo)
 Corrigir erros:
-Mover ponto GCP -> zoom no ponto com maior, aparece proximo linha vermelha do erro -> clique no ponto e vá arrastando p diminuir o erro -> play:iniciar georreferenciador -> aparece como +1 camada
+	Mover ponto GCP -> zoom no ponto com maior, aparece proximo linha vermelha do erro 
+	-> clique no ponto e vá arrastando p diminuir o erro -> play:iniciar georreferenciador -> aparece como +1 camada
 
 
 Vetorizar(desenhar) info do pdf:
-Camada -> Criar nova camada -> Nova camada shapefile -> nome, tipo: ponto/linha/poligono, nome dos campos da tabela de atributo: id, Nome, Fonte(de onde veio info)
-Seleciona camada -> ativa modo de edição -> clique com botão direito na barra de ferramentas e ative "Ferramenta de aderência" (assim qnd tiver uma camada limite que queiras usar como base, ele cria uma espécie de imã para q o desenho fique exatamente encima dela) -> ative esse imã (maior o numero, maior a aderencia) -> Add poligono -> va clicando os pontos/desenhando baseado no desenho da camada raster -> botão direito finaliza: coloque o nome, fonte: prefeitura de niteroi 2019 (forneceu o mapa pdf) -> salvar edições na camada
+	Camada -> Criar nova camada 
+	-> Nova camada shapefile -> nome, tipo: ponto/linha/poligono, nome dos campos da tabela de atributo: id, Nome, Fonte(de onde veio info)
+	Seleciona camada -> ativa modo de edição 
+	-> clique com botão direito na barra de ferramentas e ative "Ferramenta de aderência" 
+		(assim qnd tiver uma camada limite que queiras usar como base, ele cria uma espécie de imã para q o desenho fique exatamente encima dela) 
+	-> ative esse imã (maior o numero, maior a aderencia) -> Add poligono 
+	-> va clicando os pontos/desenhando baseado no desenho da camada raster 
+	-> botão direito finaliza: coloque o nome, fonte: prefeitura de niteroi 2019 (forneceu o mapa pdf) 
+	-> salvar edições na camada
