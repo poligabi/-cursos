@@ -108,6 +108,10 @@ Salvar Estilo em Galerias:
 
 	Projeto -> layout manager ->transportar info p mapa
 
+
+
+
+
 Laudo de Vegetação e APP
 Antes do Campo:
 1-Área de Intervenção (coloca limites no tablet de campo)
@@ -120,7 +124,14 @@ Antes do Campo:
 7- Equipamentos (trena, gps, maquina fotográfica...)
 
 Campo
-Cadastrar e conferir: Árvores isoladas(sp.,DAP,nativo/protegido/exotico); Fragmentos (fitossociologia); Uso e ocupação do solo; Cursos d'agua (as vezes nao existe+, ou sao maiores, tudo tem q ser atualizado); APP(presente no mapa de uso do solo, aqui coloca caracterização da situação com fotos); Fotos; Temas específicos 
+Cadastrar e conferir:
+Árvores isoladas(sp.,DAP,nativo/protegido/exotico); 
+Fragmentos (fitossociologia); 
+Uso e ocupação do solo; 
+Cursos d'agua (as vezes nao existe+, ou sao maiores, tudo tem q ser atualizado); 
+APP(presente no mapa de uso do solo, aqui coloca caracterização da situação com fotos); 
+Fotos; 
+Temas específicos 
 
 Relatório (info obtida em campo
 1ª a fazer: Mapas (atualizar com dados de campo)
@@ -229,10 +240,12 @@ Corrigir erros:
 
 Vetorizar(desenhar) info do pdf:
 	Camada -> Criar nova camada 
-	-> Nova camada shapefile -> nome, tipo: ponto/linha/poligono, nome dos campos da tabela de atributo: id, Nome, Fonte(de onde veio info)
+	-> Nova camada shapefile -> nome, tipo: ponto/linha/poligono, 
+		nome dos campos da tabela de atributo: id, Nome, Fonte(de onde veio info)
 	Seleciona camada -> ativa modo de edição 
 	-> clique com botão direito na barra de ferramentas e ative "Ferramenta de aderência" 
-		(assim qnd tiver uma camada limite que queiras usar como base, ele cria uma espécie de imã para q o desenho fique exatamente encima dela) 
+		(assim qnd tiver uma camada limite que queiras usar como base, 
+		ele cria uma espécie de imã para q o desenho fique exatamente encima dela) 
 	-> ative esse imã (maior o numero, maior a aderencia) -> Add poligono 
 	-> va clicando os pontos/desenhando baseado no desenho da camada raster 
 	-> botão direito finaliza: coloque o nome, fonte: prefeitura de niteroi 2019 (forneceu o mapa pdf) 
