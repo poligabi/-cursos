@@ -1,0 +1,1924 @@
+
+## Aula 1:
+
+## PARTE I
+###################################################################################
+## O que eh uma funcao no R
+## Entender a diferenca entre
+##  a) escrever na linha de comando,
+##  b) imprimir no monitor,
+##  c) guardar um objeto que resulta de um comando (no caso, para imprimir no monitor)
+##  d) executar uma funcao que imprime no monitor e guarda o objeto impresso
+
+## a) Escrever na linha de comando:
+Ninguem me segura!
+
+## b) Mandar escrever na linha de comando:
+cat("Ninguem me segura!")	#cat=pega linha de texto q projeta no painel d comando
+cat("\n\nNinguem me segura!") # o simbolo "\n\n" faz pular uma linha
+cat("\n\nSou o")
+
+## Ou:
+cat("Sou a Silene Seagal e ninguem me segura!\n")
+
+## c) Guardar um objeto com o conteudo que mandou escrever no monitor
+ne <- "Sou a Silene Seagal e ninguem me segura!"
+cat(ne)
+## Pergunta: Onde fica guardado o objeto? Na pasta, na memoria RAM, ou na area de trabalho?
+
+## Executar uma funcao que imprime no monitor
+cheguei <- function(nome) {
+    ne <- paste("\n\nSou o",nome,"e ninguem me segura!\n\n")
+    cat(ne)
+    return(ne)
+}
+## Teste a funcao com o comando: 
+cheguei("Glenilson") 	#retorna o resutado da funcao junto
+sp<-cheguei("Glenilson") #salva so o resultado do returno no objeto
+
+
+## PARTE II
+###################################################################################
+## Introduao ao uso de loops if, for, while
+
+
+## FunÃ§Ã£o cheguei na versao unisexo ilustra 'if'
+cheguei2 <- function(nome,sexo) {
+    if(sexo=="m") {artigo <- "o"} else {artigo <- "a"}
+    ne <- paste("\n\nSou",artigo,nome,"e ninguem me segura!\n\n")
+    cat(ne)
+}
+
+## Exemplo de loop for
+## Calcular a soma de todos os numeros inteiros de 1 a 5
+soma <- 0
+for(i in 1:5){			#(em determinadas circunstancias {faça isso
+	soma <- soma+1		#soma na primeira volta=0 e vai somando cada numero inteiro
+}
+soma
+
+soma <- 0
+for(i in 1:5){			#(em determinadas circunstancias {faça isso
+	soma <- soma+2		#vai somando 2 nessas 5vezes (voltas)
+}
+soma
+
+## Exemplo ilustrativo do 'while'
+## O 'while' difere do 'for' pois  ele repete o loop enquanto se cumprir uma
+## determinada condicao
+## Descobrir quantos sao os numeros inteiros consecutivos cuja soma eh 20, ou o
+## mais proximo possivel de 20 sem exceder esse valor
+
+soma <- 0
+resposta <- 0
+while(soma<=20){
+  resposta <- resposta + 1
+  soma <- soma + resposta
+}
+resposta <- resposta - 1
+
+#pegar 2 numeros e devolver produto
+#pegar 2 numeros e devolver a divisao
+
+## EXERCICIO
+## 1.1. Escreva uma funcao 'mult' que pega dois numeros inteiros e retorna o produto deles
+##      Esta funcao pode apenas usar o operador algebrico '+', nao pode usar o '*'
+mult<-function(x,y){
+	produto<-sum(rep(x,y))	
+	return(produto)
+}
+
+multi<-function(x,y){
+	produto=0
+	for (i in 1:x) {
+	produto<-produto+y
+	}	
+	return(produto)
+}
+m<-multi(2,3)
+m
+## 2.2. Escreva uma funcao 'divi' que pega dois numeros inteiros e retorna o resultado da
+##      divisao do primeiro pelo segundo. Esta funcao nao pode usar o operador algebrico '/'.
+##      Sua funcao pode dar somente o resultado inteiro da divisao, nao se preocupe com casas
+##      decimais.
+
+divi<-function(x,y){
+	soma<-0
+	resposta<-0
+	while(soma<=x){
+	resposta<-resposta+1	
+	soma<-soma+y
+	}	
+	return(resposta -1)		
+}
+d<-divi(10,2)
+d
+
+
+#################
+#  AULA 2
+# 4.II.2020
+#################
+
+ls() 		#mostra objetos disponiveis na RAM do R
+rm(list=ls()) #limpa objetos do R
+
+## Simulacao e analise de dados de um modelo linear generalizado
+###########################################################################
+###########################################################################
+
+## Comandos novos:
+##   Distribuicoes de probabilidade
+##       runif()
+##       rbinom()
+##       ...
+##   Criacao e manipulacao de data.frames e matrizes
+##       data.frame()
+##       matrix()
+##       [,]
+##       which()
+##       diag()
+##   Outros comandos de manipulacao de dados mais gerais
+##       c()
+##       rep()
+##       seq()
+##       sort()
+##       length()
+##   Operacoes matematicas
+##       prod()
+##       sum()
+##       exp()
+##       plogis()
+##       log()
+##       sqrt()
+##   Comandos graficos
+##       plot()
+##       lines()
+##       par()
+##       contour()
+##       abline()
+##       legend()
+##   Otimizacao, simulacao, resolucao de equacoes
+##       optim()
+##       set.seed()
+##       solve()
+
+
+## 1. Simulacao de dados de registro de Aedes em funcao da distancia ao centro
+##    da cidade
+##############################################################################
+
+set.seed(42)          # para todos termos os mesmos valores de dist ao centro
+np <- 50              # numero de pontos
+## simular distancia ao centro
+x <- runif(50,1,3)
+x <- sort(x)          # ordenar variavel ambiental por conveniencia pratica
+## Vamos modelar a probabilidade de uma coisa acontecer em funcao
+## da distancia a um lugar. Este tipo de problema eh facilmente tratavel com
+## uma distribuicao binomial associada a um modelo linear
+## f(prob da coisa acontecer) = beta0 + beta1*distancia
+
+## a) Definir valores de beta para a simulacao
+beta0 <- -2  ## intercepto
+beta1 <- 1.7 ## esse eh o efeito da distancia sobre a deteccao (+dist +facil)
+
+
+## b) Definir probabilidade de a especie ocorrer com base no modelo linear
+##    Parar aqui para explicar logit e invlogit(opcao 1 = opcao 2)
+psi1 <- exp(beta0 + beta1*x) / (1 + exp(beta0 + beta1*x)) # opcao 1
+psi2 <- plogis(beta0 + beta1*x)  # opcao 2 = 1
+##    verificar que as duas opcoes sao iguais e limpar area de trabalho
+cbind(psi1,psi2)
+
+psi <- psi1
+rm(list=c("psi2","psi1")) # removendo os objetos psi1 e psi2 e ficando soh com psi (vetor)
+
+# c) Simular registro da especie pelos np pontos
+z <- rbinom(n=np,size=1,prob=psi) ## n, numero de observacoes;
+                      ## size,numero de sorteios;
+                      ## prob, probabilidade de sucesso.
+## Como se le: pegue um vetor de probabilidades com np valores e
+## lance uma moeda 1 vez para cada um registrando o resultado binario (0 ou 1)
+y <- z
+
+# d) Visualizar simulacao
+par(mfrow=c(2,1),mar=c(4,7,3,7))
+# painel 1
+plot(x,z,main="Verdade: relacao dist-registro de mosquito",ylab="z ou psi, espaco prob")
+lines(x,psi)
+# painel 2
+logitpsi <- log(psi/(1-psi))
+plot(x,logitpsi,type="l",ylab="logit do psi, espaco logit")
+## O que acontece se representarmos a simulacao no espaco logit?
+## O painel 2 mostra q ao representar os dados usando o logit(psi), obtemos uma relacao linear
+
+
+
+## 2. Analise de verossimilhanca maxima, sobre os dados simulados
+####################################################################################
+## Daqui para a frente soh sei os dados de distancia ao centro e registro de mosquitos
+## Vou tentar estimar beta0 e beta1
+## Vou comecar por supor valores para beta0 e beta1, guardo suposicao em vetor
+
+## verossimil=plausivel
+## o computador busca combinacoes de dois numeros (que sao beta0 e beta1)
+## por todo o espaco possivel e devolve valores onde a verossimilhanca eh maxima.
+
+## se estes parametros sao verdadeiros, qual a prob de encontrar os dados que encontrei?
+## faco o percurso inverso a simulacao pois agora so tenho os dados e com isso os
+## uso para obter psi
+
+## Suposicao arbitraria dos betas
+sup_betas <- c(-1,3)
+## a) Se a suposicao for verdadeira, qual sera a probabilidade de a esp occorer em cada ponto
+sbeta0 <- sup_betas[1] 	#nomeou cada elemento
+sbeta1 <- sup_betas[2]
+spsi <- plogis(sbeta0 + sbeta1*x) #colocando na formula temos os psi
+## b) Sabendo a probabilidade da especie ocorrer em cada ponto, qual eh a probabilidade de ver
+##    o que vi em cada ponto (com observacao perfeita)
+pdados <- spsi^y * (1-spsi)^(1-y) 	#formula q mackenzie usou no excel
+
+## c) Sabendo a probabilidade de cada observacao, qual a probabilidade de todas?
+ptot <- prod(pdados)  # aqui tenho a prob de acontecer o que vi no campo | sup_betas
+#verossimilhanca de todos ocorrerem (multiplica todas as probabilidades)
+
+
+## Valor de ptot eh muito baixo, temos de trabalhar com logaritmos para evitar problemas
+## de computacao. 
+log(ptot)  #valor é maior mas negativo
+-log(ptot)
+###Em seguida ja obtenho o log neg para trabalhar com numeros melhor comportados
+nlptot <- -sum(log(pdados))  #negativo do log da verossimilhaca
+
+-log(prod(pdados))
+
+
+## Parte II Exercicio: Analise de Verossimilhanca de um GLM
+######################################################################
+
+## a. Escrever uma funcao de log da verossimilhanca negativa para a regressao logistica
+negLogLike <- function(betas,y,x) {
+	beta0 <- betas[1]		#valor na primeira posicao do par de betas representara intercept
+	beta1 <- betas[2]		#valor na segunda posicao do par de betas representara inclinacao
+	psi <- exp(beta0 + beta1*x) / (1 + exp(beta0 + beta1*x)) #transforma formula em probabilidade
+	likelihood<- psi^y * (1-psi)^(1-y)		#formula de verossimilhanca p dados binomiais
+	negll<- -sum(log(likelihood))		#p aumentar o valor mantendo a informacao sem deixar negativo
+	return(negll)  				
+}
+
+## ...
+
+## testar funcaoo com alguns pares de valores
+
+negLogLike(c(2,3),c(1,0,0,0,1),c(4.6,6.4,7.2,2.5,7.8))
+
+
+
+
+
+## b. Estimar parametros beta0 e beta1 da regressao logistica - solucao grafica
+# Criar eixos horizontais (betas) de uma superficie de verossimilhanca
+beta0s <- seq(-10,10,0.5)  #criando uma sequencia de beta0s de -10 a +10, de 0.5 em 0.5
+beta1s <- seq(-10,10,0.5) #fazendo o mesmo com beta1s
+
+size <- length(beta0s)
+
+# Criar suporte para ARMAZENAR informacao do eixo vertical
+NLL <- matrix(0,ncol=size,nrow=size) #matriz formada por zeros
+# Criar suporte para sbetas
+cbetas <- rep(0,2)  # beta corrente. Nesse for eu irei preencher a matriz com os valores gerados.
+for (i in 1:size) { #loop pra preencher a primeira casinha. Aqui digo pra ele ir no beta0 e preencher o primeiro espaco. Sempre linhas e depois colunas.
+    cbetas[1] <- beta0s[i]
+    for (j in 1:size) {   #fazendo o mesmo, mas agora com os beta1s
+        cbetas[2] <- beta1s[j]
+        NLL[i,j] <- negLogLike(cbetas,z,x)
+    }
+}
+
+
+####################### GRAFICO CURVA DE NIVEL
+par(mfrow=c(1,1))
+contour(beta0s,beta1s,NLL,nlevels=40,xlab="Beta0",ylab="Beta1")  
+#representa o grafico da cuia/vale, eixo x, eixo y, curvas de nivel, quant d curvas
+estind <- which(NLL==min(NLL),arr.ind=TRUE)  #procurando o valor minimo dos betas
+estbeta0 <- beta0s[estind[1]]
+estbeta1 <- beta1s[estind[2]]
+abline(v=estbeta0) #cria linha vertical
+abline(h=estbeta1) #cria linha horizontal
+abline(v=beta0, col="red")
+abline(v=beta1, col="red") #betas verdadeiros (q usamos na simulacao)
+
+## c. Estimar parametros beta0 e beta1 da regressao logistica - solucao de otimizacao
+## Minimizar a funcao (outra forma d achar os betas minimos)
+start.val <- c(beta0=0,beta1=0)
+opt.out <- optim(start.val,negLogLike,y=z,x=x,hessian=TRUE)  ## procurar entre o -inf e +inf
+#argumentos(conjunto com betas, funcao negLogLik, y=probs, x=0e1s, hessian=)
+(mles <- opt.out$par)  ## um dos resultados dentro da funcao optim
+
+## Tabular estimativas
+mle.table <- data.frame(Est=mles,  #aqui consigo obter mais q o MLE, obtenho IC, SE
+                        SE=sqrt(diag(solve(opt.out$hessian))))
+mle.table$lower <- mle.table$Est - 1.96*mle.table$SE
+mle.table$upper <- mle.table$Est + 1.96*mle.table$SE
+mle.table		#betas verdadeiros estao dentro do intervalo de confianca
+
+## Plotar a relacao verdadeira e a relacao estimada
+plot(x,z,xlab="Distancia do centro",ylab="Probabilidade de Ocorrencia")
+plot(function(x)plogis(-3+2*x),1,3,add=TRUE,lwd=2)
+plot(function(x)plogis(mles[1] + mles[2]*x),1,3,add=TRUE,lwd=2,col="blue")
+legend(2,0.2,c("Verdadeira","Estimada"),col=c("black","blue"),lty=1,lwd=2)
+
+
+
+
+## d. Estimar parametros beta0 e beta1 por analise Bayesiana
+
+## Carregue o pacote jagsUI que ajuda o R a falar com o jags
+library(jagsUI)
+
+##  Crie uma lista como todas as informacoes que entram no modelo
+str(jags.data <- list(y = y, S = length(y), Xamb = x)) 
+#y= dados (vetor), S= sitios(escalar), Xamb= variavel ambiental (vetor)
+#str lista tudo isso
+
+setwd("C:/R/introModelHierarq")
+# Descrever o modelo em linguagem JAGS
+sink("Occ.txt")
+cat("
+model {
+
+    # Specify priors
+    psi.intercept ~ dunif(0,1)    # intercepto do psi (0-1)
+    beta0 <- logit(psi.intercept) # beta0 (logit do psi)
+    beta1 ~ dnorm(0, 0.0001)      # beta1 (media0 e variancia longa pois nao sabes) 
+
+    # Equacoes da verossimilhanca
+    for (i in 1:S){			#p valores d i variando de 1 ate S (n sites)
+        logit(psi[i]) <- beta0 + beta1*Xamb[i]	#logit = b0+b1*x
+        y[i] ~ dbern(psi[i])		#y segue dist Bernouli com parametro psi
+    } # S
+
+}
+",fill = TRUE)
+sink()
+
+
+## Parametros a serem monitorados
+params <- c("beta0","beta1") #,"psi")
+
+## Configuracoes da MCMC para teste
+ni <- 300; nt <- 1; nb <- 250; nc <- 3; na <- 100
+#ni=repeticoes 
+#nt=thining,pega todos valores(1 em 1), mas qnd repeticoes muito longas pode pedir p guardar de 2 em 2 e diante
+#nb=burning, a parte inicial queimada da busca, ex.so aproveitaremos 50 pontos 300-250
+#nc=n de cadeias (sequencias de valores), quanto+, +confianca no resultado
+#na=adaptacao, testando diferentes criterios no inicio
+## Configuracoes da MCMC para estimativa
+ni <- 40000; nt <- 1; nb <- 10000; nc <- 3; na <- 3000
+
+# Rodar a MCMC
+
+resultados <- jags(jags.data, inits = NULL, params, "Occ.txt",
+                    n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,n.adapt = na)
+summary(resultados)
+resultados
+#
+#Rhat=medida do quanto as cadeias usadas estao fazendo a mesma coisa/andando pelo mesmo lugar
+#Rhat=nao aceita se >1.1
+#n.eff=quantas amostras a posteriori seriam precisas p obter essa distribuicao
+#deviance= -log(verossimilhança) no ponto correspondente maxima verossimilhanca
+plot(resultados)
+
+
+####################
+#  AULA 3
+#  5.II.2020
+###################
+
+
+## Aula Pratica # 3: Estimativa de probabilidade de ocorrencia com deteccao
+## imperfeita, usando um GLM hierarquico
+## O modelo assume fechamento da populacao com respeito a extincao local e
+## colonizacao durante o periodo de amostragem - quer dizer, qualquer coisa
+## que esta presente em qualquer coluna estara presente nas outras
+
+## Comandos novos:
+##   matrix()
+##   [,]
+##   rep()
+##   rbinom()
+
+## Revisao
+##   loop for e contador de voltas do loop
+##   if else
+
+## Simulacao de dados para analise no modelo hierarquico
+set.seed(42)
+np <- 50
+nv <- 5
+x <- runif(np,0.05,5) # x e a distancia ao centro
+x <- sort(x)
+
+beta0 <- -3
+beta1 <- 2
+p <- 0.3
+alfa0 <- log(p/(1-p))
+
+# Simular probabilidade de ocorrencia de mosquito em cada ponto
+psi <- plogis(beta0 + beta1*x)
+# Simular a presenca real da especie
+z <- rbinom(np,1,psi)
+# Simular uma visita com deteccao imperfeita a todos os sÃ­tios
+y <- rbinom(np,1,z*p)
+# Visualizar relacao entre x e presenca real da especie
+# junto com observacoes
+plot(x,z,main="Comparacao da verdade com a observacao",ylab="presenca OU deteccao")
+points(x,y,col="red")
+
+
+## Simular deteccao pelas nv visitas aos np pontos com p < 1
+Y <- matrix(rep(0,nv*np),ncol=nv) #cria matrix com zeros, nv=n visitas np=n places
+for (i in 1:nv) {
+    Y[,i] <- rbinom(np,1,p*z) #np lancamentos de 1 moeda com a prob*z
+				#p*z= prob d detectar so qnd tem (p*0=0)
+}
+
+###########################################################################
+# Escrever a funcao de verossimilhanca
+
+negLogLikeH <- function(thetas,Y,x) { 
+  # desempacotar os parametros
+	beta0 <- thetas[1]
+	beta1 <- thetas[2]
+    	alpha <- thetas[3]  		#alpha= log(p/1-p)
+  # derivar os valores de psi e de p com base nos parametros
+	psi <-exp(beta0 + beta1*x)/(1+exp(beta0+beta1*x)) #formula p verossim. binomial d psi
+	p <- plogis(alpha) 		#plogis = inverso do logit
+  # calcular a verosimilhanca
+	nv<-ncol(Y)
+  	np<-nrow(Y)
+	likelihood<-rep(0,np)		#vetor para alocar os likelihood
+for (i in 1:np){										#n deteccoes
+	 if(sum(Y[i,])==0){ #condicao para diferenciar qnd cada formula deve ser usada
+		likelihood[i]<-psi[i]*((1-p)^nv) +(1-psi[i])
+		} 		#probabilidade quando nao ha detec no historico
+		else {
+		likelihood[i]<-psi[i] * (p^sum(Y[i,])) * ((1-p)^(nv-(sum(Y[i,]))))
+		} #probabilidade quando ha deteccao no historico
+	} 
+  # entregar o resultado final de - log vero
+  return(-sum(log(likelihood)))  #tira log, soma elementos e multiplica por menos 1.
+}
+
+#...
+
+# Escrever a funcao de verossimilhanca
+
+negLogLikeH <- function(thetas,Y,x) { 
+  # desempacotar os parametros
+	beta0 <- thetas[1]
+	beta1 <- thetas[2]
+    	alpha <- thetas[3]  		#alpha= log(p/1-p)
+  # derivar os valores de psi e de p com base nos parametros
+	psi <-exp(beta0 + beta1*x)/(1+exp(beta0+beta1*x)) #formula p verossim. binomial d psi
+	p <- plogis(alpha) 		#plogis = inverso do logit
+  # calcular a verosimilhanca
+	nv<-ncol(Y)
+  	np<-nrow(Y)
+	likelihood<-rep(0,np)		#vetor para alocar os likelihood
+for (i in 1:np){										#n deteccoes
+	 likelihood[i]<-ifelse(sum(Y[i,])==0, psi[i]*((1-p)^nv) +(1-psi[i]), psi[i] * (p^sum(Y[i,])) * ((1-p)^(nv-(sum(Y[i,]))))
+		) #probabilidade quando nao ha ou quando ha deteccao no historico
+	} 
+  # entregar o resultado final de - log vero
+  return(-sum(log(likelihood)))  #tira log, soma elementos e multiplica por menos 1.
+}
+
+#...
+
+
+
+# Minimizar a funcao
+start.val <- c(beta0=0,beta1=0,alfa0=0)  ## valores iniciais de busca
+opt.out <- optim(start.val,negLogLikeH,Y=Y,x=x,hessian=TRUE)
+## funcao optim pega os vals iniciais (e ao fazer isso, ja sabe quantos parm tem),
+## pega os dados as cov, e o criterio de busca (Hessian)
+(mles <- opt.out$par)
+
+# Tabular estimativas no espaco logit
+mle.table <- data.frame(Est=mles,
+                        SE=sqrt(diag(solve(opt.out$hessian))))
+mle.table$lower <- mle.table$Est - 1.96*mle.table$SE
+mle.table$upper <- mle.table$Est + 1.96*mle.table$SE
+mle.table
+
+# Acrescentar estimativa de p
+p.est <- c(plogis(mle.table[3,1]),NA,plogis(mle.table[3,3]),plogis(mle.table[3,4]))
+mle.table <- rbind(mle.table,p.est)
+rownames(mle.table)[4] <- "p"
+
+
+##### Agora estimar os mesmos parametros no contexto Bayesiano
+
+## Carregue o pacote
+library(jagsUI)
+
+##  Crie uma lista como todas as informacoes que entram no modelo
+str(jgs.data <- list(y = Y, S = dim(Y)[1],V = dim(Y)[2], Xamb = x))
+
+# Descrever o modelo em linguagem JAGS
+sink("OccDec.txt")
+cat("
+model {
+
+    # Especificar priors- Probabilidades dos parametros independente dos dados
+    psi.intercept ~ dunif(0,1) 	#intercepto do psi
+    beta0 <- logit(psi.intercept) 	#beta0
+    beta1 ~ dnorm(0, 0.0001) 		#beta1
+    p ~ dunif(0,1) 			#deteccao
+
+
+    # Verossimilhanca
+    for (i in 1:S){
+        logit(psi[i]) <- beta0 + beta1*Xamb[i]
+        z[i] ~ dbern(psi[i]) # determinacao do estado ecologico do sitio
+        for (v in 1:V){
+            y[i,v] ~ dbern(z[i]*p) # determinacao do resultado das observacoes
+        }#V			#p nao esta indexado pq nao estamos considerando q ele varie, mas poderia
+    }#S
+
+}
+",fill = TRUE)
+sink()
+
+
+# Determinar valores iniciais (q sejam compativeis com observado, ele nao aceita 0 se a sp esta presente)
+zst <- apply(Y, 1, max, na.rm = TRUE)	# Ocorrencia observada como valor inicial
+zst[zst == '-Inf'] <- 1 		# Util caso haja NA
+inits <- function(){ list(z = zst)}
+
+## Parametros a serem monitorados
+params <- c("beta0","beta1","p")#,"psi")
+
+## Configuracoes da MCMC para teste #qnd acha q pode dar erro rode pouquinho
+ni <- 1500; nt <- 1; nb <- 200; nc <- 3; na <- 200
+## Configuracoes para estimativa #depois q teste deu certo rode+
+ni <- 80000; nt <- 2; nb <- 20000; nc <- 3; na <- 1000
+
+
+# Rodar a MCMC
+resultados <- jags(jgs.data, inits, params, "OccDec.txt",
+                   n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb,n.adapt = na)
+
+summary(resultados)
+resultados
+plot(resultados)
+
+
+##################
+# AULA 4
+# 
+##################
+
+# Codigo da implementacao do Modelo de Dinamica de ocupacao de sitios, 
+## ver Mackenzie et al. 2003 e Royle & Kery 2007
+
+#rm(list=ls())
+require(rgdal)
+require(raster)
+require(rgeos)
+require (spdep)
+require(jagsUI)
+require(ggplot2)
+require(sf)
+
+grid<-readOGR(dsn=getwd(),layer="gridpo-all") #p baixar shapefiles (coloque
+plot(grid)
+#tens q organizar os dados na ordem q aparece no shapefile para ele poder fazer a associação
+#faz um subset só dos grids sendo utilizados
+
+## carregar os dados de deteccao dos mosquitos, e de covariaveis ambientais
+load("jags_data.RData")
+# objeto dentro do arquivo "jags.data" 
+## y = 'array' dados de deteccao e nao deteccao de Aedes aegypti, municipios x semanas x dias por semana
+## Xpop = populacao de cada um dos municipios em 2017 - municipio x populacao (Valores padronizados pela media e sd depois de logaritmizados da populacao)
+## Xtemp = temperatura de cada semana (media semanal dos valores diarios de temperatura minima e maxima, obtidos nas 36 estacoes convencionais do INMET no RS), semana x temperatura
+## Xprec = Pluviosidade de cada semana (media semanal dos valores diarios de pluviosidade, obtidos nas 36 estacoes convencionais do INMET no RS), semana x pluviosidade 
+## Xinteracao = interacao entre temperatura e pluviosidade, semana x interacao 
+
+## carregar dados espaciais
+load("poligonos_munRS.RData")
+# objetos dentro do arquivo "poligonos_munRS"
+## shape_munRS = shapefile de todos os municipios do RS
+## subset_munRS = subset dos municipios
+
+
+##################################################################
+## compilacao do modelo em linguagem BUGS
+## e salvar o txt com o codigo que o JAGS ira ler
+
+sink("Din_simples.txt") #abriu, tem q fechar depois
+cat("
+    model { 
+
+      #############################################################
+      #                                                           #
+      #                  Ecological process (pra calcular occu)   #
+      #                                                           #
+      #############################################################
+      
+      # Specify prior distributions for model parameters
+      
+      psi ~  dunif(0,1)  ## prior for occupation
+
+      # setting priors for parameters we will include in the colonization (gamma) model
+      alpha.gamma ~ dunif (0,1)
+      intercept.gamma <- logit (alpha.gamma)
+      beta.gamma.pop ~ dnorm(0, 1.0E-6)
+
+      ## defining model for colonization (gamma)
+      for (i in 1:nsite){ ## for each week t, estimate a gamma value based on week variation in temperature
+         logit (gamma[i]) <- intercept.gamma + beta.gamma.pop * Xpop [i] 
+      }
+
+      # setting priors for parameters we will include in the persistence (phi) model
+      alpha.phi ~ dunif (0,1)
+      intercept.phi <- logit (alpha.phi)
+      beta.phi.temp ~ dnorm(0, 1.0E-6)
+      beta.phi.prec ~ dnorm(0, 1.0E-6)
+      beta.phi.interacao ~ dnorm(0, 1.0E-6)
+
+      #  building the model for persistence
+      for (t in 1:(nweek-1)){ ## for each week t, estimate phi based on weekly variation in temperature
+         		#nweek-1 pois a contagem eh d transicoes entre semanas
+		logit(phi[t]) <- intercept.phi + beta.phi.temp*Xtemp[t] + 
+                          beta.phi.prec*Xprec[t] +
+                          beta.phi.interacao*Xinteracao[t]
+      }
+    
+      # Specify the state model conditional on parameters
+      # Likelihood
+
+      for(i in 1:nsite){ 
+
+         # occupancy status initialization (zi in week 1)
+         z[i,1] ~ dbern(psi) 
+          
+         for(t in 2:nweek){   
+          
+            ### defining occupancy probability
+            muZ[i,t]<- z[i,t-1] * phi[t-1] +   ### if occupied in t-1, probability of stay occupied in t;
+                    (1-z[i,t-1]) * gamma [i] 	## if unnocupied in t-1, probability of get occupied in t
+
+            z[i,t] ~ dbern(muZ[i,t])## z in site i, week t, is a realization of a Bernoulli distribution    
+
+          } 
+       }   
+      
+
+      #############################################################
+      #                                                           #
+      #                  Observation process    (p)               #
+      #                                                           #
+      #############################################################
+    	for (t in 1:nweek){		#se quiser deixar constant p, so tirar o loop for, e o indexador (aqui e na formula abaixo)
+      p[t] ~ dunif(0,1) 	## prior for detection probability 
+		}
+      
+      # Specify the observation model conditional on occupancy state
+      
+      for(i in 1:nsite){
+         for (t in 1:nweek){
+             for(j in 1:nday) {
+
+                Py[i,t,j]<- z[i,t]*p[t]
+                y[i,t,j] ~ dbern(Py[i,t,j])   
+
+             } 
+         }
+      } 
+      
+      #############################################################
+      #                                                           #
+      #                  Derived quantities                       #
+      #                                                           #
+      #############################################################
+    
+      # Compute sample and population occupancy, growth rate and turnover)
+      
+      psivec[1]<-psi ## define psi as occupancy at t=1
+      psi.fs[1]<-sum(z[1:nsite,1])/nsite  ## calculate proportion of occupied sites in time 1
+      
+      ## calculating average gamma over sites
+      mean.gamma <- mean (gamma)
+
+      for(t in 2:nweek){  ## for each week
+
+          psivec[t] <- psivec[t-1]*phi[t-1] + (1-psivec[t-1])* mean.gamma ## occupancy changes over time
+          psi.fs[t] <- sum(z[1:nsite,t])/nsite  ## proportion of occupied sites
+          growthr[t] <- psivec[t]/psivec[t-1] ## calculate growth rate (or rate of change in occupancy) 
+          turnover[t-1] <- ( 1 - psivec[t-1]) * mean.gamma/psivec[t]  ## calculate site turnover 
+          psi.eq[t-1] <- mean.gamma/(mean.gamma + (1-phi[t-1]))
+          sens.gamma [t-1] <- (1-phi [t-1])/pow((mean.gamma+(1-phi[t-1])), 2) ## sensitivity to small change in gamma
+          sens.epslon [t-1] <- - mean.gamma/pow((mean.gamma+(1-phi[t-1])), 2) ## sensitivity to small change in gamma
+          sens.phi [t-1] <- (mean.gamma)/pow((mean.gamma+1-phi[t-1]), 2) ## sensitivity to small change in phi
+      } 
+    
+      ## calculate the expected number of weeks with infestation, per municipality i
+      for (i in 1:nsite) {
+         nweek_inf[i] <- sum(z[i,1:nweek]) 
+      }
+    
+    }",fill = TRUE) ## end of the model
+
+sink()
+
+
+
+
+## formatting data
+str(jags.data <- list(y = jags.data$y, ## y= deteccao e nao deteccao
+                      nsite= jags.data$nsite, nweek= jags.data$nweek,nday = jags.data$nday, ## informacoes para os loops
+                     Xtemp = jags.data$Xtemp, # covariavel temperatura 
+                     Xpop= jags.data$Xpop, ## covariavel populacao
+                     Xprec = jags.data$Xprec, ## covariavel precipitacao
+                     Xinteracao = jags.data$Xinteracao ## covariavel interacao temp x prec
+                     ))
+
+# Set initial values -- the initial guess for z
+zst <- apply(jags.data$y, c(1, 2), max, na.rm = TRUE)	# Observed occurrence as inits for z
+zst[zst == '-Inf'] <- 1 # max of c(NA,NA,NA) with na.rm = TRUE returns -Inf, change to 1
+inits <- function(){ list(z = zst)}
+
+
+## Parameters to monitor
+#########################
+## short form
+params <- c("intercept.gamma", "beta.gamma.pop","mean.gamma",
+            "intercept.phi","beta.phi.temp", "beta.phi.prec","beta.phi.interacao",
+            "p", "psivec","psi.fs","growthr","turnover","psi.eq",
+            "sens.gamma","sens.phi","sens.epslon",
+            "nweek_inf","gamma","phi")
+
+
+## MCMC settings
+######################
+## short form
+ na <- 100; nb <- 500; ni <- 1000; nc <- 2; nt <- 1
+## long form
+# na <- 50000; nb <- 100000; ni <- 200000; nc <- 2; nt <- 250
+
+## run JAGS
+samples_AAEG_tp <- jags (data = jags.data, parameters.to.save = params, 
+                        model.file = "Din_simples.txt", 
+                        inits = inits, n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, 
+                        DIC = T, parallel=T, #queres rodar as cadeias paralelamente? (ajuda a diminuir o tempo de processamento dividindo nos cores do computador)
+				n.cores=nc) #em quantos nucleos do seu computador? =nc=n cadeias dos parametros, 
+				#nao coloque numero acima dos cores do seu pc
+
+# not run (only run if you want to save the results)
+#save(samples_AAEG_t, file="res_modelo_dinamico.RData")
+
+#########################################################################
+###                                                                   ###
+### interpretacao dos parametros estimados e das quantias derivadas   ###
+###                                                                   ###
+#########################################################################
+
+plot(subset_munRS)
+
+## abrir o arquivo com os resultados
+load("res_modelo_dinamico.RData")
+
+## MAPeamento do numero de semanas esperadas como infestadas, por sitio (municipio)
+cores <- data.frame (cores=samples_AAEG_t$sd$nweek_inf,NM_MUNICIP=subset_munRS@data$NM_MUNICIP)
+		#aqui inseristes os dados por municipio ->mean=infestacoes por municipio; sd=mapa da incerteza
+f.mun<-fortify(subset_munRS, region="NM_MUNICIP") 	#destrincha as coordenadas do municio 
+				#pois ggplot precisa de um valor p definir cada linha
+f.mun<- cbind (f.mun, Namostral= cores [match (f.mun$id, cores$NM_MUNICIP),]$cores)
+
+a <- ggplot() + geom_polygon (data=shape_munRS, aes(x=long, y=lat, group=group),size = 0.1, fill="gray95", colour="gray80",alpha=1) +
+  coord_fixed (xlim = c(-53.05, -50.5),  ylim = c(-29, -27.4), ratio = 1) 
+		#especifica o quadrado q quer
+
+b <- a #+ geom_polygon(data=lagos, aes(x=long,y=lat, group=group),size=0.1, fill="lightcyan",colour="lightcyan",alpha=1)
+		#para poder modificar esse objeto mantendo o original
+c <- b+  geom_polygon(data=f.mun, aes(x=long, y=lat, group=group, color=Namostral, fill=Namostral), colour = NA, size=1) + 
+  labs (title= expression (paste ("A) InfestaÃ§Ã£o por ",italic ("Aedes aegypti"))),size=2)+#, subtitle = format (lista_datas[39], format="%d-%m-%Y"))+
+  scale_fill_gradient2 (low='white', high='darkred', midpoint=5, limits=c(0,16), name="NÃºmero de\nsemanas com\ninfestaÃ§Ã£o") ## para continuo
+				#midpoint:onde começa a ficar +red, limits=extremos
+d <-c +  annotate(geom="text", x=-51, y=-27.5, label="Santa Catarina",color="black",size=3)
+			#indica onde esta santa catarina, e abaixo add escala
+e<-d + ggsn::scalebar(f.mun, dist = 15, st.dist=0.02,st.size=2, height=0.02, dd2km = TRUE, 
+                       dist_unit="km",transform=T, ## se der erro "transform should be logical, ative estes argumentos, e desative o argumento 'dd2km=TRUE'"
+                      model = 'WGS84', location = "bottomright")
+
+f<-e + theme(panel.background = element_rect(fill = "lightgrey", colour = "lightgrey", size = 0.5, linetype = "solid")) + xlab("") + ylab("Latitude (graus decimais)") +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  #theme(legend.position = "none")+
+  theme(plot.title = element_text(size=8),axis.text=element_text(size=4),
+        axis.text.x = element_text(size=5),
+        axis.title.x = element_text(size = 7),
+        axis.text.y = element_text(size=5),
+        axis.title.y = element_text(size = 7)) +
+  theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "lines"))
+
+f_north <- f + ggsn::north(f.mun, symbol=1) +
+  theme(legend.text=element_text(size=7)) +
+  theme (legend.title=element_text(size=8))
+
+
+######################################################################
+# variacao semanal na proporcao de  municipios infestados
+
+plot(samples_AAEG_t$mean$psi.fs,type = "l",xaxt = "n",
+     xlab = "     2016                                            2017",
+     ylab = "Proporcao de munici­pios infestados, por semana",
+     sub ="Mes",ylim=c(0,1))
+lapply (seq (1,nrow (samples_AAEG_t$sims.list$psi.fs)), function (i) #faz um lapply pra cada um ser ter q usar for(i in 1:n)
+  lines(samples_AAEG_t$sims.list$psi.fs [i,],col="gray"))	#linhas d incertezas
+
+lines(samples_AAEG_t$mean$psi.fs,lwd=2)		#linha media
+
+axis(labels =  c("J","F","M","A","M","J","J","A","S","O","N","D","J","F","M","A","M","J","J","A","S","O","N","D"),
+     las = 1, side = 1, at = seq(-1,103,by=4.5),cex.axis=0.75)
+
+### Explorar o efeito da temperatura na probabilidade de persistencia (qnd as outras covariaveis estao no valor medio)
+plot(seq (-2.5,1.6,0.1),
+     plogis (samples_AAEG_t$mean$intercept.phi +
+               samples_AAEG_t$mean$beta.phi.temp* seq (-2.5,1.6,0.1) +
+               samples_AAEG_t$mean$beta.phi.prec* 0 + 	#*0 deixa apenas valor medio dessas variaveis q foram padronizadas
+               samples_AAEG_t$mean$beta.phi.interacao* 0 ),type="l",
+     xlab="Temperatura (padronizada pela media e sd)",
+     ylab=expression (paste ("Probabilidade de persistencia (",phi, ")",sep=""))
+     )
+
+
+lapply (seq (1,length(samples_AAEG_t$sims.list$intercept.phi)), function (i) 		#linhas das incertezas
+  lines(seq (-2.5,1.6,0.1), ## eixo X
+        plogis (samples_AAEG_t$sims.list$intercept.phi [i]+
+                  samples_AAEG_t$sims.list$beta.phi.temp[i] *  seq (-2.5,1.6,0.1) +
+                  samples_AAEG_t$sims.list$beta.phi.prec[i] * 0 +
+                  samples_AAEG_t$sims.list$beta.phi.interacao[i] * 0 ),col="gray")) # eixo Y
+
+lines(seq (-2.5,1.6,0.1),			#linha media de novo
+      plogis (samples_AAEG_t$mean$intercept.phi +
+                samples_AAEG_t$mean$beta.phi.temp* seq (-2.5,1.6,0.1) +
+                samples_AAEG_t$mean$beta.phi.prec*0 +
+                samples_AAEG_t$mean$beta.phi.interacao*0),col="black",lwd=2)
+
+### Explorar o efeito da pluviosidade na probabilidade de persistencia
+plot(seq  (-1,5,0.1),
+     plogis (samples_AAEG_t$mean$intercept.phi +
+               samples_AAEG_t$mean$beta.phi.temp* 0 +
+               samples_AAEG_t$mean$beta.phi.prec* seq (-1,5,0.1) +
+               samples_AAEG_t$mean$beta.phi.interacao* 0 ),type="l",
+     xlab="Pluviosidade (padronizada pela media e sd)",
+     ylab = expression (paste ("Probabilidade de persistÃªncia (",phi, ")",sep="")))
+
+
+lapply (seq (1,length(samples_AAEG_t$sims.list$intercept.phi)), function (i)
+  lines(seq (-1,5,0.1), ## eixo X
+        plogis (samples_AAEG_t$sims.list$intercept.phi [i] +
+                  samples_AAEG_t$sims.list$beta.phi.temp[i] *  0+
+                  samples_AAEG_t$sims.list$beta.phi.prec[i] * seq (-1,5,0.1)+
+                  samples_AAEG_t$sims.list$beta.phi.interacao [i] * 0),col="gray")) # eixo Y
+
+lines(seq (-1,5,0.1),
+      plogis (samples_AAEG_t$mean$intercept.phi +
+                samples_AAEG_t$mean$beta.phi.temp* 0 +
+                samples_AAEG_t$mean$beta.phi.prec* seq (-1,5,0.1) +
+                samples_AAEG_t$mean$beta.phi.interacao* 0 ),col="black",lwd=2)
+
+### Explorar o efeito da interacao entre temperatura e pluviosidade na probabilidade de persistencia
+plot(seq (-3,3,0.1),
+     plogis (samples_AAEG_t$mean$intercept.phi +
+               samples_AAEG_t$mean$beta.phi.temp* 0+
+               samples_AAEG_t$mean$beta.phi.prec* 0 +
+               samples_AAEG_t$mean$beta.phi.interacao* seq (-3,3,0.1) ),type="l",
+     xlab="Interacao Temperatura x Pluviosidade\n (padronizada pela media e sd)",
+     ylab=expression (paste ("Probabilidade de persistÃªncia (",phi, ")",sep=""))
+)
+
+
+lapply (seq (1,length(samples_AAEG_t$sims.list$intercept.phi)), function (i)
+  lines(seq (-3,3,0.1), ## eixo X
+        plogis (samples_AAEG_t$sims.list$intercept.phi [i]+
+                  samples_AAEG_t$sims.list$beta.phi.temp[i] *  0 +
+                  samples_AAEG_t$sims.list$beta.phi.prec[i] * 0 +
+                  samples_AAEG_t$sims.list$beta.phi.interacao[i] * seq (-3,3,0.1)),col="gray")) # eixo Y
+
+lines(seq (-3,3,0.1),
+      plogis (samples_AAEG_t$mean$intercept.phi +
+                samples_AAEG_t$mean$beta.phi.temp* 0 +
+                samples_AAEG_t$mean$beta.phi.prec* 0 +
+                samples_AAEG_t$mean$beta.phi.interacao* seq (-3,3,0.1)),col="black",lwd=2)
+
+
+######################################################################
+## relacao entre psi.eq e sensitividade a persistencia e colonizacao
+
+plot(samples_AAEG_t$mean$psi.eq,samples_AAEG_t$mean$sens.phi,type="p",pch=19,
+   xlab=expression (paste ("Ocupacao no equili­brio (",Psi,"*", ")",sep="")),
+   ylab = "Sensitividade do parametro, por semana")
+lines(samples_AAEG_t$mean$psi.eq,samples_AAEG_t$mean$sens.gamma,type="p",pch=19,col="red")
+
+abline(h=max(samples_AAEG_t$mean$sens.gamma),lty=2,lwd=2,col="gray50")
+abline(v=samples_AAEG_t$mean$psi.eq[which(samples_AAEG_t$mean$sens.gamma == max(samples_AAEG_t$mean$sens.gamma))],
+  lty=2,lwd=2,col="gray50")
+
+legend ("topleft", c(expression (paste ("Sensitividade a colonizacao (",gamma, ")",sep="")),
+                     expression (paste ("Sensitividade a persistencia (", phi, ")", sep=""))),
+        pch=19,col=c("red", "black"),bty="n")
+        
+        
+#####################
+# AULA 4 ALTERNATIVA
+#  unmarked
+#####################
+
+## Codigo para analisar dados de deteccao/nao deteccao de
+##  Aedes aegypti no Rio Grande do Sul, utilizando a abordagem descrita em 
+##  McKenzie et al. 2002
+
+## escolha o diretorio de trabalho com os dados de Aedes aegypti
+setwd("...Dia 4/")
+
+### carregue os dados de deteccao/nao deteccao e os dados das covariaveis de sitio e de observacao
+load("dados_exercicio_unmarked.RData")
+## descricao dos objetvos
+## aegypti_det = deteccoes e nao deteccoes de aedes aegypti (1= deteccao, 0= nao deteccao)
+## nos 496 municipios do RS, nos 7 dias de amostragem da semana epidemiologica 16
+
+## aegypti_esf= numero de tubitos (eppendorfs) com formas imaturas de larvas coletados por dia de vigilancia
+## 496 municipios do RS, 7 dias de amostragem durante a semana epidemiologica 16
+
+## forest_cover = proporcao de cobertura florestal de cada municipio (dados de Ribeiro et al. 2009)
+## 496 municipios, 1 coluna interessa (AFcover)
+
+## pop_2017= populacao dos municipios no ano de 2017 (dados IBGE)
+## 496 municipios, uma coluna interessa (POP_2017)
+
+## temp_sem= temperatura media da semana epidem. de vigilancia
+## 496 municipios, 7 colunas (dias de amostragem) (dados do INMET)
+
+## temp_ant = temperatura media da semana anterior a semana de vigilancia
+## 496 municipios, 7 colunas (dias de amostragem) (dados do INMET)
+
+## prec_sem= precipitacao da semana epidem. de vigilancia
+## 496 municipios, 7 colunas (dias de amostragem) (dados do INMET)
+
+## prec_ant = precipitacao da semana anterior a semana de vigilancia
+## 496 municipios, 7 colunas (dias de amostragem) (dados do INMET)
+
+## Carregar pacotes
+library("unmarked")
+## Se aparecer a mensagem:
+##   Error in library("unmarked") : there is no package called "unmarked"
+## De o comando:
+##   install.packages("unmarked")
+## e depois volte a dar o comando acima
+
+### tratamento de covariaveis de sitio (variam entre sÃ­tios)
+## realizar transformacoes e padronizacoes necessarias nas covariaveis de sitio
+## padronizar a cobertura florestal
+floresta_st=scale(forest_cover$AFcover)[,1]
+
+## log transformar e padronizar a populacao dos municipios
+populacao_st=scale(log(pop_2017$POP_2017))[,1]
+
+## obter covariaveis de sitio descrevendo a temperatura e precipitacao acumuladas em 2 semanas
+temp_ac <- cbind (temp_ant,temp_sem)# colar os dados de temperatura das duas semanas
+temp_ac_st <- scale(rowSums(temp_ac))# somar as linhas para obter temp acumulada e entao padronizar
+prec_ac <- cbind (prec_ant,prec_sem)# colar os dados de precipitacao das duas semanas
+prec_ac_st <- scale(rowSums(prec_ac))# somar as linhas para obter temp acumulada e entao padronizar
+
+#### tratamento das covariaveis de observacao (variam ao longo dos si?tios e dias de amostragem)
+## padronizar as covariaveis de observacao
+temp_sem_st <- (temp_sem - mean(as.matrix(temp_sem)))/sd(as.matrix(temp_sem))# temperatura da semana
+temp_ant_st <- (temp_ant - mean(as.matrix(temp_ant)))/sd(as.matrix(temp_ant))# temperatura da semana anterior
+prec_sem_st <- (prec_sem - mean(as.matrix(prec_sem)))/sd(as.matrix(prec_sem))# precipitacao da semana
+prec_ant_st <- (prec_ant - mean(as.matrix(prec_ant)))/sd(as.matrix(prec_ant))# precipitacao da semana anterior
+# transformar (raiz quadrada) e padronizar o esforco amostral
+esforco <- sqrt(aegypti_esf)# transformar
+esforco_st <- (esforco - mean(as.matrix(esforco)))/sd(as.matrix(esforco))# padronizar esforco
+
+## formatar os dados de acordo com os requerimentos do pacote
+## y eh uma matriz, com os sÃ­tios nas linhas, dias de amostragem nas colunas
+## siteCovs deve ser um dataframe, onde cada linha eh um si?tio e cada coluna uma covariavel
+## obsCovs deve ser uma lista, onde cada linha eh um si?tio e cada elemento equivale a uma covariavel
+
+unmarked_data <- unmarkedFrameOccu(y=aegypti_det,
+                      siteCovs = cbind(data.frame (floresta=floresta_st, populacao=populacao_st,
+                                                   temp_ac=temp_ac_st, prec_ac=prec_ac_st)),
+                      obsCovs = list(temp_sem=temp_sem_st,temp_ant=temp_ant_st,
+                                        prec_sem=prec_sem_st, prec_ant=prec_ant_st,
+                                     esforco=esforco_st))
+
+## Com base em algum conhecimento que vocÃª tenha sobre a biologia de mosquitos,
+## construa diferentes modelos representando hipoteses alternativas
+## para definir os fatores explicando a deteccao e ocupacao de Aedes aegypti.
+## Veja os exemplos abaixo
+## Ajuste os modelos seguindo este formato: occu (~ deteccao ~ocupacao, dados)
+mod1 <- occu(~1 ~1, unmarked_data)
+mod2 <- occu(~esforco ~floresta, unmarked_data)
+
+## fazer uma lista de modelos
+## nomeie cada modelo de acordo com cada covariavel de cada componente dos seus modelos hierarquicos
+lista_modelos <- fitList('p(.)psi(.)'= mod1, 
+                         'p(esf)psi(forest)'= mod2)
+
+## rankear os modelos de acordo com AIC (quanto menor o valor de AIC, melhor o modelo se ajusta aos dados)
+## Mostrar tabela de selecao de modelos
+selecao_modelos <- modSel(lista_modelos,nullmod='p(.)psi(.)')
+
+## segundo o melhor modelo, qual a probabilidade ocupacao quando a variavel de sitio estao na media
+backTransform(linearComb(mod2, c(1,0), type="state"))
+
+## predizer ocupacao para valores especificos da covariavel
+comb_linear <- linearComb(mod2, matrix(c(1,range(floresta_st)[1],# valor minimo de cob floresta padronizada
+							1,0, # valor medio de cob florestal padronizada
+							1,range(floresta_st)[2]),## valor máximo de cob florestal padronizada
+							ncol=2,byrow=T), type="state")
+backTransform(comb_linear)
+
+## qual eh a probabilidade de deteccao quando o esforco amostral esta na media
+backTransform(linearComb(mod2, c(1,0), type="det"))
+
+## predicoes considerando todos os valores possíveis da minha covariavel (neste caso, floresta)
+
+## construa graficos com valores preditos de ocupacao e deteccao de acordo com os fatores de cada componente do modelo
+## obter dados preditos de acordo com o range de valores das covariaveis padronizadas
+dados_novos<- data.frame (floresta=seq(range(floresta_st)[1],range(floresta_st)[2],0.01))
+pred_occur<- predict (mod2,type="state", dados_novos,append=T)
+dados_novos<- data.frame (esforco=seq(range(esforco_st)[1],range(esforco_st)[2],0.01))
+pred_detec<- predict(mod2,type="det", dados_novos,append=T)
+
+## construa os plots
+## ocupacao
+plot(pred_occur$floresta,pred_occur$Predicted,type="l",lwd=3,xlab="Forest cover",
+     ylab=expression (paste (italic("Aedes aegypti "), "occupancy (",Psi,")",sep=" ")))
+lines(pred_occur$floresta,pred_occur$lower)
+lines(pred_occur$floresta,pred_occur$upper)
+
+## deteccao
+plot(pred_detec$esforco,pred_detec$Predicted,type="l",lwd=3,xlab="Sampling effort (number of eppendorfs)",
+     ylab=expression (paste (italic("Aedes aegypti "), "detection (p)",sep=" ")))
+lines(pred_detec$esforco,pred_detec$lower)
+lines(pred_detec$esforco,pred_detec$upper)
+
+######################################################
+## codigo para construirmos um mapa da probabilidade de ocorrencia de Aedes aegypti no RS
+######################################################
+
+require(raster) ## (instale se necessario com install.packages('raster',dependencies=T))
+require(ggsn) ## install.packages("ggsn", dependencies=T)
+require(rgdal)## carregar os pacotes (instale se necessario com install.packages('rgdal',dependencies=T))
+require (maptools) # install.packages("maptools", dependencies=T)
+require(gpclib) # instale com install.packages("gpclib", type = "source",dependencies=T)
+if (!require(gpclib)) install.packages("gpclib", type="source")
+gpclibPermit()
+
+## abrir o RData com dados espaciais (shapefiles)
+load("dados_espaciais.RData")
+## descricao dos dados
+#### munRS = shapefile dos municipios do Rio Grande do Sul
+#### lagoas = shapefile dos lagos do RS
+#### southAme = shapefile da america do Sul (para o fundo)
+
+## cortar o shapefile southAme para pegar os paises vizinhos ao Brasil
+BR_AR_URU<- southAme [southAme@data$COUNTRY == "Paraguay" | southAme@data$COUNTRY == "Brazil" | southAme@data$COUNTRY == "Argentina" | southAme@data$COUNTRY == "Uruguay", ]
+crs(munRS)<-crs(BR_AR_URU) ## definir o sistema de coordenada refencia (crs) para o shapefile do RS,
+                          ## com base no crs do shapefile da ASul
+
+## para fazer o mapa, utilizaremos o pacote ggplot2
+require(ggplot2)
+
+## construir um dataframe com os valores que desejamos colocar no mapa, que representarao as 'cores'
+## pegue o output do melhor modelo
+cores <- data.frame (cores=predict (mod2,type="state")$Predicted,NM_MUNICIP=munRS@data$NM_MUNICIP)
+
+## fortify "destrincha" um dataframe de acordo com um fator especificado (nesse caso "NM_MUNICIP", que sao os nomes do municipios do RS)
+## este eh o formato requerido pelo ggplot
+f.mun<-fortify(munRS, region="NM_MUNICIP")
+
+## fazer a correspondencia entre as cores e os municipios
+f.mun<- cbind (f.mun, Namostral= cores [match (f.mun$id, cores$NM_MUNICIP),]$cores)
+
+## fazer um mapa inicial do fundo do mapa
+a <- ggplot() + geom_polygon (data=BR_AR_URU, aes(x=long, y=lat, group=group),size = 0.1, fill="gray90", colour="gray75",alpha=1) +
+  coord_fixed (xlim = c(-57.5, -49),  ylim = c(-34, -27), ratio = 1) 
+
+## inserir nestes mapas os lagos
+b <- a + geom_polygon(data=lagos, aes(x=long,y=lat, group=group),size=0.1, fill="lightcyan",colour="lightcyan",alpha=1)
+
+## plotar a probabilidade de ocorrencia em cada municipio
+c<- b+  geom_polygon(data=f.mun, aes(x=long, y=lat, group=group, color=Namostral, fill=Namostral), colour = NA, size=1) + 
+  labs (title= expression (paste ("Ocorrencia de ",italic ("Aedes aegypti"))),size=1)+
+  scale_fill_gradient2 (low='white', high='darkred', midpoint=0.2, limits=c(0,0.7), 
+                        name="Probabilidade\nde ocupacao") ## para continuo
+
+## colocar anotacoes no mapa, de modo a descrever os paises/estado limitrofes
+d<-c + annotate(geom="text", x=-56, y=-32, label="URUGUAI",color="black",size=3) +
+  annotate(geom="text", x=-56.5, y=-27.8, label="ARGENTINA",color="black",size=3)+
+  annotate(geom="text", x=-56.5, y=-27, label="PARAGUAI",color="black",size=3)+
+  annotate(geom="text", x=-51.8, y=-27, label="Santa Catarina",color="black",size=3)+
+  annotate(geom="text", x=-50.5, y=-32.5, label="OCEANO ATLANTICO",color="black",size=3)
+
+## inserir uma escala no mapa
+e<-d + ggsn::scalebar(f.mun, dist = 100, st.dist=0.02,st.size=3, height=0.01, transform = TRUE, 
+                      dist_unit="km",model = 'WGS84', location = "bottomright")
+
+## colorir o fundo de azul, para representar o oceano; colocar os nomes dos eixos
+f<-e + theme(panel.background = element_rect(fill = "lightcyan", colour = "lightcyan", 
+                                             size = 0.5, linetype = "solid")) + 
+  xlab("Longitude (graus decimais)") + ylab("Latitude (graus decimais)") 
+
+## ajustar o tamanho dos nomes nos eixos, titulo e legenda
+g<- f+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(plot.title = element_text(size=13),axis.text=element_text(size=10),
+        axis.text.x = element_text(size=6),
+        axis.title.x = element_text(size = 10),
+        axis.text.y = element_text(size=6),
+        axis.title.y = element_text(size = 10)) +
+  theme(legend.text=element_text(size=8)) +
+  theme (legend.title=element_text(size=10)) +
+  theme(plot.margin = unit(c(0.1, 0.1, 0.1, 0.1), "lines")) # ajuste da margem
+
+## indicar o norte
+g_north <- g + ggsn::north(f.mun, symbol=1) 
+
+## temos que apresentar o plot para salvar utilizando a funcao 'ggsave'  
+g_north
+
+## salvar o mapa em formato PNG
+ggsave(f_north = "mapa_aedes_aegypti.png", width = 6,height=6,dpi =300)
+
+
+## Exercicio 4:
+##
+## Escolha um dos cenarios abaixo e use o R para simular dados de detecao/nao-detecao
+## de uma especie na natureza. Em seguida, use o pacote unmarked para ajustar aos
+## dados um conjunto de modelos a sua escolha. O seu conjunto de modelos precisa incluir
+## o modelo que descreve o cenario que voce escolheu. Com base em uma comparacao do AIC dos
+## diferentes modelos que voce ajustar, mostre que o modelo que descreve o cenario escolhido
+## eh realmente o modelo que melhor representa os seus dados. Este eh um exercicio circular:
+## primeiro, voce vai simular dados de acordo com um modelo (ou cenario escolhido), depois
+## voce ajusta os modelos aos dados, e finalmente mostra que o modelo usado na simulacao eh o
+## que melhor se ajusta aos dados que voce simulou.
+##     Para demonstrar que seus dados foram simulados corretamente, voce deve mostrar nao
+## so a tabela de AIC, mas tambem as estimativas dos parametros do melhor modelo.
+##     Para entender melhor os cenarios abaixo, pense numa especie de lagarto que se distribui
+## por um conjunto de sitios que apresentam diferentes altitudes (CovS1) e inclinacoes do
+## terreno (CovS2). Voce amostra esta especie em um conjunto de sitios a sua escolha e
+## em um numero de visitas tambem a sua escolha. No entanto, em diferentes visitas a diferentes
+## sitios voce pode ter mais ou menos luz solar direta (CovA1), o que pode ou nao influenciar
+## seu sucesso de amostragem. Os quatro cenarios abaixo representam diferentes relacoes entre
+## as tres covariaveis listadas acima e os dois parametros centrais dos seus modelos, a
+## probabilidade de ocupacao de sitios (psi) e a probabilidade de deteccao da especie naqueles
+## sitios que ela realmente ocupa (p). Escolha apenas um dos quatro cenarios abaixo e identifique
+## claramente qual cenario voce escolheu.
+##
+#### SOLUCAO ####
+
+## Cenario 1: Psi diminui com o aumento da altitude, e p aumenta com a quantidade de luz solar.
+## CovS1 efeito negativo sobre psi (CovS1=altitude)
+## CovA1 efeito positivo sobre p (CovA1=luz)
+
+## Cenario 2: Psi aumenta com o aumento da altitude, e p diminui com o aumento da altitude.
+## Parte 1: Simulacao dos dados
+
+## Cenario 3: Psi aumenta com o aumento da altitude e diminui com o aumento da inclinacao do
+##            terreno; p eh fixo.
+
+## Cenario 4: Psi aumenta com o aumento da altitude e com o aumento da inclinacao. Mas o efeito da
+## altitude eh mais forte que o efeito da inclinacao; p eh fixo.
+
+
+#####################
+# AULA 5
+# 7.II.2020
+####################
+
+
+# This is the most recent code from the Alejandra MuÃ±oz paper, 
+# coming from Marc, dated September 2017 and found in January 2020
+# Any changes with respect to what we used for the paper were
+# done after 22 January, 2020
+
+## Clean up
+rm(list=ls())
+## Load data
+load("DadosMunoz40Sps.RData")
+#spsl=lista de sp
+#CHARRAY= matriz com 7 colunas e 40 camadas (p cada sp)
+#AGEARRAY=matriz tem 6 colunas pois o aumento da idade so conta depois da primeira captura
+
+## Load JAGS for the analysis
+library(jagsUI)
+
+## Rename the arrays, to make the coding simpler 
+spsl
+CH <- CHARRAY
+X <- AGEARRAY
+str(CH
+## New number of species
+( nspec <- dim(CH)[3] )
+
+## New sample sizes (number of individuals per species)
+sampsize <- numeric(nspec)
+for(s in 1:nspec){
+  sampsize[s] <- sum(!is.na(CH[,1,s]))
+}
+
+## Create a matrix of first-capture occasions
+fmat <- array(NA, dim = c(max(sampsize), nspec))
+for(s in 1:nspec){  # Loop over species and fill fmat
+  fmat[,s] <- apply(CH[,,s], 1, function(x) min(which(x!=0)))
+}
+fmat[fmat == 'Inf'] <- NA
+
+## Recode of the age matrix like this: 1=juveniles,2=adults, 3=uncertain age when banded
+X[X == 1] <- 4
+X[X == 2] <- 1
+X[X == 3] <- 2
+X[X == 4] <- 3
+
+table(X)
+
+                              #######  MODELS WITH AGE EFFECTS ########
+
+##  1) Model phi(species*age{random}), p(species{random}), 
+##     with different heterogeneity parameter for survival and 
+##     with time-constant age ratio omega
+
+# Bundle data for JAGS
+str(bugs.data <- list(y = CH,  #
+			X = X, 	# n ind d diferentes idades
+			f = fmat, 	#
+			nind = sampsize, 	#n individuos por sampsize
+			n.occ = dim(CH)[2], #n d lugares ocupados
+			nspec = nspec))		#n d sp
+
+# Specify hierarchical CJS model in BUGS language: cjsMod1
+# This model integrates all the data
+sink("cjsMod1.txt")
+cat("
+    model {
+    
+    # Priors and hyperpriors
+    # The next lines define phi and p as random effects from a prior distribution
+    # This is the model for how species vary in the community
+    for(s in 1:nspec){ # Define priors for phi and p parameters
+       for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+          phi[s,a] <- exp(lphi[s,a]) / (1 + exp(lphi[s,a]))
+          lphi[s,a] ~ dnorm(mu.lphi[a], tau.lphi[a])   # Prior for logit(survival): 
+		#indexado em a pois occu varia com a idade
+          # specify a statistical distribution for the logit transformation
+          # of the survival probability of species s, this statistical
+          # distribution has two hyperparameters which we estimate
+       }
+       p[s] <- exp(lp[s]) / (1 + exp(lp[s]))
+       lp[s] ~ dnorm(mu.lp, tau.lp)		#nao indexamos detec com idade
+    
+       # Mixture model for survival of individuals with age class 3
+       # Survival of age-class 3 is a weighted average of juvenile and adult survival, 
+       # where omega is the weight:
+       # the estimated proportion of juveniles
+       phi[s,3] <- omega[s] * phi[s,1] + (1-omega[s]) * phi[s,2] # weighted average
+       omega[s] ~ dunif(0,1)   # Priors for the proportion of juveniles
+    }
+    
+    # The next lines give (hyper-)priors for the hyperparameters that
+    #  characterise the entire community of species
+    for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+       mu.lphi[a] <- logit(mean.phi[a]) # Hyperpriors for survival hyperparams
+       mean.phi[a] ~ dunif(0,1)       # mean hyperparam. (community avge. survival)
+       tau.lphi[a] <- pow(sd.lphi[a], -2)
+       sd.lphi[a] ~ dunif(0, 3)       # sd hyperparam. (community variability surv.)
+    }
+    
+    mu.lp <- logit(mean.p)      # Hyperpriors for recapture hyperparams
+    mean.p ~ dunif(0,1)         # mean hyperparameter (community average recapt.)
+    tau.lp <- pow(sd.lp, -2)
+    sd.lp ~ dunif(0, 3)         # sd hyperparam. (community heterogeneity recap.)
+    
+    # Likelihood for both subsets of data at once (i.e., for the single data set)
+    for(s in 1:nspec){           # Loop over species
+       for(i in 1:nind[s]){       # Loop over individuals (nind varies by species)
+          # Define latent state at first capture
+          z[i,f[i,s], s] <- 1
+          for(t in (f[i,s]+1):n.occ){ # Loop over occasions
+             # State process: the latent alive/dead state
+             z[i,t,s] ~ dbern(mu1[i,t,s]) #individuo da sp no tempo t esta vivo ou morto
+             mu1[i,t,s] <- z[i,t-1,s] * phi[s, X[i, t-1, s]]	#sobrev=estado do individuo no momento anterior vezes...
+		  					#a sobrevivencia
+             # Observation process: relates true state to observed state, y = ch
+             y[i,t,s] ~ dbern(mu2[i,t,s])
+             mu2[i,t,s] <- z[i,t,s] * p[s]     # p also indexed by species
+          } #t
+       } #i
+    } #s
+    
+    # Compute difference in the two survival SD parameters for juvenile and adult
+    diff.sd <- sd.lphi[1]- sd.lphi[2]
+    
+}
+",fill = TRUE)
+sink()
+
+
+# Get inits for JAGS
+known.state.cjs <- function(CH, sampsize){ # Function definition
+  state <- CH
+  for (i in 1:sampsize){      # note yellow is new
+    n1 <- min(which(CH[i,]==1))
+    n2 <- max(which(CH[i,]==1))
+    state[i,n1:n2] <- 1
+    state[i,n1] <- NA
+  }
+  state[state==0] <- NA
+  return(state)
+}
+
+# Initial values for CJS1 model for JAGS for both data subsets
+zst <- CH
+for(s in 1:nspec){
+  zst[,,s] <- known.state.cjs(CH[,,s], sampsize[s])
+}
+
+
+# NEW inits function for JAGS
+inits <- function(){list(z = zst, mean.phi = runif(2, 0, 1), sd.lphi = runif(2, 0, 1), mean.p = runif(1, 0, 1), sd.lp = runif(1, 0, 1), omega = runif(nspec))}
+
+
+# Parameters and hyperparameters monitored
+params <- c("mean.phi", "mu.lphi", "sd.lphi", "diff.sd", 
+		"mean.p", "mu.lp", "sd.lp", "phi", "p", "omega")
+
+
+# MCMC settings 
+#ni <- 500000   ;   nt <- 4   ;   nb <- 100000   ;   nc <- 3 # very serious setting
+ni <- 50000   ;   nt <- 5   ;   nb <- 5000   ;   nc <- 3 # serious setting
+#ni <- 15000   ;   nt <- 2   ;   nb <- 5000   ;   nc <- 3  # quite serious settings
+#ni <- 5000   ;   nt <- 2   ;   nb <- 1000   ;   nc <- 3  # medium serious settings
+#ni <- 50   ;   nt <- 2   ;   nb <- 10   ;   nc <- 2  # test settings
+
+# Call JAGS from R
+outM1 <- jags(bugs.data, inits, params, model.file="cjsMod1.txt", n.chains = nc, n.thin = nt, 
+				n.iter = ni, n.burnin = nb, parallel = T,
+				n.cores=nc)
+par(mfrow = c(2,2))   ;   traceplot(outM1, param = c("mean.phi", "mu.lphi", "sd.lphi", "diff.sd", "mean.p", "mu.lp", "sd.lp"))
+print(outM1, 3)
+
+
+# Plot of the posterior distributions of the hyperparameters
+par(mfrow = c(3, 2))
+hist(outM1$sims.list$mean.phi[,1], breaks = 100, col = "gold", main = "Mean hyperparameter juvenile survival", xlim = c(0,1))
+hist(outM1$sims.list$sd.lphi[,1], breaks = 100, col = "gold", main = "Standard deviation hyperparameter juvenile survival", xlim = c(0,3))
+
+hist(outM1$sims.list$mean.phi[,2], breaks = 100, col = "gold", main = "Mean hyperparameter adult survival", xlim = c(0,1))
+hist(outM1$sims.list$sd.lphi[,2], breaks = 100, col = "gold", main = "Standard deviation hyperparameter adult survival", xlim = c(0,3))
+
+hist(outM1$sims.list$p, breaks = 100, col = "gold", main = "Mean hyperparameter recapture rate", xlim = c(0,1))
+hist(outM1$sims.list$sd.lp, breaks = 100, col = "gold", main = "Standard deviation hyperparameter recapture rate", xlim = c(0,3))
+
+# Plot of the posterior distribution of the two means of juvenile and adult survival
+difference <- outM1$sims.list$mean.phi[,2] - outM1$sims.list$mean.phi[,1]
+hist(difference, breaks = 100, col = "gray", main = "Difference in Mean hyperparameters for juvenile and adult survival", xlim = c(-0.5,0.5))
+abline(v = quantile(difference, probs = c(0.025, 0.975)), lwd = 2)
+
+# Same for SD hyperparameter
+hist(outM1$sims.list$diff.sd, breaks = 100, col = "gold", main = "Difference in SD hyperparameters for juvenile and adult survival", xlim = c(-3,3))
+abline(v = quantile(outM1$sims.list$diff.sd, probs = c(0.025, 0.975)), lwd = 3)
+
+# Plot of posterior distributions for phi and p for fun
+
+par(mfrow = c(3, 3))
+for(s in 1:nspec){
+  hist(outM1$sims.list$phi[,s,1], breaks = 100, col = "gold", main = paste('phi(juv) of', spsl[s]))
+  hist(outM1$sims.list$phi[,s,2], breaks = 100, col = "gold", main = paste('phi(ad) of', spsl[s]))
+  hist(outM1$sims.list$p[,s], breaks = 100, col = "gold", main = paste('p of', spsl[s]))
+  browser()
+}
+
+############################## PLOTS FOR DATA SET OF 40 SPECIES##################################
+# Plot juvenile and adult survival for all 40 species
+# shorter names of species like this: shortname <- c("P. albifrons", "...")
+
+shortnames <- c("T.murinus","T.ardesiacus","T.caesius","E.gutturalis",
+                "M.axillaris","M.longipennis","M.menetriesii","H.cantator",
+                "P.rufifrons","M.ferruginea","P.albifrons","G.rufigula","W. poecilinotus","C.aurita","F.colma","C.stictolaemus","D.merula","D.fuliginosa",
+                "G.spirurus","X.pardalotus","X.minutus","P.erythrocercum","A. ochrolaemus","A.infuscatus","M.macconnelli","P.saturatus","P.coronatus","M.barbatus","A.spadiceus","C.gutturalis","L.serena","M.manacus","D.pipra","C.erythrocephala","P.coraya","C.arada","M.collaris","T.albicollis","T.surinamus",
+                "C.cyanoides")
+par(mfrow=c(1,1))
+par(mar = c(12,5,2,2))
+plot(1:40-0.1, outM1$summary[11:50,1], pch = 1, main = "Juv. (open, red) and ad survival (closed, blue) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'phi', axes = F, col = 'red')
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)  
+axis(2, las = 1)
+segments(1:40-0.1, outM1$summary[11:50,3], 1:40-0.1, outM1$summary[11:50,7], col = 'red')
+points(1:40+0.1, outM1$summary[51:90,1], pch = 16, col = 'blue')
+segments(1:40+0.1, outM1$summary[51:90,3], 1:40+0.1, outM1$summary[51:90,7], col = 'blue')
+abline(h=outM1$mean$mean.phi[1], lty = 'dashed', col = 'red')
+abline(h= outM1$mean$mean.phi[2], lty = 'solid', col = 'blue')
+
+# Plot recapture rate for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM1$summary[131:170,1], pch = 16, main = "Recapture for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM1$summary[131:170,3], 1:40, outM1$summary[131:170,7])
+abline(h=outM1$mean$mean.p, lty = 'solid')
+
+
+# Plot average age ratio (proportion juveniles omega) for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM1$summary[171:210,1], pch = 16, main = "Age ratio (proportion juveniles in unknown-age birds) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM1$summary[171:210,3], 1:40, outM1$summary[171:210,7])
+
+
+################################ Model 2 =variancia jovens e adultos  ######################################
+
+## 2) Model phi(species*age{random}), p(species{random})
+## the SAME heterogeneity parameter for survival of both age classes and with time-constant age ratio
+
+# Bundle data for JAGS
+str(bugs.data <- list(y = CH, X = X, f = fmat, nind = sampsize, n.occ = dim(CH)[2], nspec = nspec))
+
+# Specify hierarchical CJS model in BUGS language: cjsMod2
+# This model integrates all the data
+sink("cjsMod2.txt")
+cat("
+model {
+    
+   # Priors and hyperpriors
+   # The next lines define phi and p as random effects from a prior distribution
+   # This is the model for how species vary in the community
+   # In contrast to model 6X, there is a single heterogeneity parameter for
+   # juvenile and adult survival only
+   for(s in 1:nspec){ # Define priors for phi and p parameters
+      for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+         phi[s,a] <- exp(lphi[s,a]) / (1 + exp(lphi[s,a]))
+         lphi[s,a] ~ dnorm(mu.lphi[a], tau.lphi)   # Prior for logit(survival): 
+         # here we specify a statistical distribution for the logit transformation
+         # of the survival probability of species s, AND this statistical
+         # distribution has (in this case two) hyperparameters which we estimate
+      }
+      p[s] <- exp(lp[s]) / (1 + exp(lp[s]))
+      lp[s] ~ dnorm(mu.lp, tau.lp)
+      # Mixture model for survival and recapture of individuals with age class 3
+      # This is the critical new stuff: survival of age-class 3 is a weighted
+      # average of juvenile and adult survival, where omega is the weight:
+      # the estimated proportion of juveniles
+      phi[s,3] <- omega[s] * phi[s,1] + (1-omega[s]) * phi[s,2] # weighted average
+      omega[s] ~ dunif(0,1)   # Priors for the proportion of juveniles
+   }
+    
+   # The next lines give (hyper-)priors for the hyperparameters that
+   #  characterise the entire community of species
+   for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+      mu.lphi[a] <- logit(mean.phi[a]) # Hyperpriors for survival mean hyperparams
+      mean.phi[a] ~ dunif(0,1)       # mean hyperparam. (community avge. survival)
+   }
+    
+   # There are no longer two SD hyperparameters for survival, but only a single one
+   tau.lphi <- pow(sd.lphi, -2)
+   sd.lphi ~ dunif(0, 3)       # sd hyperparam. (community variability surv.)
+    
+   mu.lp <- logit(mean.p)      # Hyperpriors for recapture hyperparams
+   mean.p ~ dunif(0,1)         # mean hyperparameter (community average recapt.)
+   tau.lp <- pow(sd.lp, -2)
+   sd.lp ~ dunif(0, 3)         # sd hyperparam. (community heterogeneity recap.)
+    
+   # Likelihood for both subsets of data at once (i.e., for the single data set)
+   for(s in 1:nspec){           # Loop over species
+      for(i in 1:nind[s]){       # Loop over individuals (nind varies by species)
+         # Define latent state at first capture
+         z[i,f[i,s], s] <- 1
+         for(t in (f[i,s]+1):n.occ){ # Loop over occasions
+            # State process: the latent alive/dead state
+            z[i,t,s] ~ dbern(mu1[i,t,s])
+            mu1[i,t,s] <- z[i,t-1,s] * phi[s, X[i, t-1, s]]
+            # Observation process: relates true state to observed state, y = ch
+            y[i,t,s] ~ dbern(mu2[i,t,s])
+            mu2[i,t,s] <- z[i,t,s] * p[s]     # p also indexed by species
+         } #t
+      } #i
+   } #s
+}
+",fill = TRUE)
+sink()
+
+
+# Get inits for JAGS
+known.state.cjs <- function(CH, sampsize){ # Function definition
+  state <- CH
+  for (i in 1:sampsize){      # note yellow is new
+    n1 <- min(which(CH[i,]==1))
+    n2 <- max(which(CH[i,]==1))
+    state[i,n1:n2] <- 1
+    state[i,n1] <- NA
+  }
+  state[state==0] <- NA
+  return(state)
+}
+
+# Initial values for CJS1 model for JAGS for both data subsets
+zst <- CH
+for(s in 1:nspec){
+  zst[,,s] <- known.state.cjs(CH[,,s], sampsize[s])
+}
+
+
+# NEW inits function for JAGS
+inits <- function(){list(z = zst, mean.phi = runif(2, 0, 1), sd.lphi = runif(1), mean.p = runif(1, 0, 1), sd.lp = runif(1, 0, 1), omega = runif(nspec))}
+
+
+# Parameters and hyperparameters monitored
+params <- c("mean.phi", "mu.lphi", "sd.lphi", "mean.p", "mu.lp", "sd.lp", "phi", "p", "omega")
+
+
+# MCMC settings 
+ni <- 500000   ;   nt <- 4   ;   nb <- 100000   ;   nc <- 3 # very serious setting
+#ni <- 50000   ;   nt <- 5   ;   nb <- 5000   ;   nc <- 3 # serious setting
+#ni <- 15000   ;   nt <- 2   ;   nb <- 5000   ;   nc <- 3  # quite serious settings
+#ni <- 5000   ;   nt <- 2   ;   nb <- 1000   ;   nc <- 3  # medium serious settings
+#ni <- 50   ;   nt <- 2   ;   nb <- 10   ;   nc <- 3  # test settings
+
+# Call JAGS from R
+outM2 <- jags(bugs.data, inits, params, "cjsMod2.txt", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, parallel = T)
+par(mfrow = c(2,2))   ;   traceplot(outM2, param = c("mean.phi", "mu.lphi", "sd.lphi", "mean.p", "mu.lp", "sd.lp"))
+print(outM2, 3)
+
+# Plot posterior distributions of the hyperparameters
+par(mfrow = c(3, 2))
+hist(outM2$sims.list$mean.phi[,1], breaks = 100, col = "gold", main = "Mean hyperparameter juvenile survival", xlim = c(0,1))
+hist(outM2$sims.list$sd.lphi, breaks = 100, col = "gold", main = "Common standard deviation hyperparameter (both age classes)", xlim = c(0,3))
+
+hist(outM2$sims.list$mean.phi[,2], breaks = 100, col = "gold", main = "Mean hyperparameter adult survival", xlim = c(0,1))
+hist(outM2$sims.list$sd.lphi, breaks = 100, col = "gold", main = "Common standard deviation hyperparameter (both age classes)", xlim = c(0,3))
+
+hist(outM2$sims.list$p, breaks = 100, col = "gold", main = "Mean hyperparameter recapture rate", xlim = c(0,1))
+hist(outM2$sims.list$sd.lp, breaks = 100, col = "gold", main = "Standard deviation hyperparameter recapture rate", xlim = c(0,3))
+
+# Plot of the posterior distribution of the two means of juvenile and adult survival
+difference <- outM2$sims.list$mean.phi[,2] - outM2$sims.list$mean.phi[,1]
+hist(difference, breaks = 100, col = "gold", main = "Difference in Mean hyperparameters for juvenile and adult survival", xlim = c(-0.5,0.5))
+abline(v = quantile(difference, probs = c(0.025, 0.975)), lwd = 3)
+
+# Plot posterior distributions for phi and p for fun
+par(mfrow = c(3, 3))
+for(s in 1:nspec){
+  hist(outM2$sims.list$phi[,s,1], breaks = 100, col = "gold", main = paste('phi(juv) of', spsl[s]))
+  hist(outM2$sims.list$phi[,s,2], breaks = 100, col = "gold", main = paste('phi(ad) of', spsl[s]))
+  hist(outM2$sims.list$p[,s], breaks = 100, col = "gold", main = paste('p of', spsl[s]))
+  browser()
+}
+
+############################## PLOTS FOR DATA SET OF 40 SPECIES##################################
+# Plot juvenile and adult survival for all 40 species
+# shorter names of species like this: shortname <- c("P. albifrons", "...")
+
+shortnames <- c("T.murinus","T.ardesiacus","T.caesius","E.gutturalis",
+                "M.axillaris","M.longipennis","M.menetriesii","H.cantator",
+                "P.rufifrons","M.ferruginea","P.albifrons","G.rufigula","W. poecilinotus","C.aurita","F.colma","C.stictolaemus","D.merula","D.fuliginosa",
+                "G.spirurus","X.pardalotus","X.minutus","P.erythrocercum","A. ochrolaemus","A.infuscatus","M.macconnelli","P.saturatus","P.coronatus","M.barbatus","A.spadiceus","C.gutturalis","L.serena","M.manacus","D.pipra","C.erythrocephala","P.coraya","C.arada","M.collaris","T.albicollis","T.surinamus",
+                "C.cyanoides")
+
+par(mar = c(12,5,2,2))
+plot(1:40-0.1, outM2$summary[9:48,1], pch = 1, main = "Juv. (open, red) and ad survival (closed, blue) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'phi', axes = F, col = 'red')
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)  
+axis(2, las = 1)
+segments(1:40-0.1, outM2$summary[9:48,3], 1:40-0.1, outM2$summary[9:48,7], col = 'red')
+points(1:40+0.1, outM2$summary[49:88,1], pch = 16, col = 'blue') #points is a function to plot another set of data over the same graph
+segments(1:40+0.1, outM2$summary[49:88,3], 1:40+0.1, outM2$summary[49:88,7], col = 'blue')
+abline(h=outM2$mean$mean.phi[1], lty = 'dashed', col = 'red')
+abline(h= outM2$mean$mean.phi[2], lty = 'solid', col = 'blue')
+
+
+# Plot recapture rate for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM2$summary[129:168,1], pch = 16, main = "Recapture for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM2$summary[129:168,3], 1:40, outM2$summary[129:168,7])
+abline(h=outM2$mean$mean.p, lty = 'solid')
+
+
+# Plot average age ratio (proportion juveniles omega) for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM2$summary[169:208,1], pch = 16, main = "Age ratio (proportion juveniles in unknown-age birds) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM2$summary[169:208,3], 1:40, outM2$summary[169:208,7])
+
+
+########################## Model 3 sem efeitos randomicos cada sp eh um caso separado
+
+####  3) Model phi(species*age{fixed}), p(species{fixed}) and with time-constant age ratio
+
+# Bundle data for JAGS
+str(bugs.data <- list(y = CH, X = X, f = fmat, nind = sampsize, n.occ = dim(CH)[2], nspec = nspec))
+
+# Specify hierarchical CJS model in BUGS language: cjsMod3
+# This model integrates all the data
+sink("cjsMod3.txt")
+cat("
+model {
+    
+   # Priors
+   # In contrast to the previous models, we now do NOT specify hyperparameters
+   for(s in 1:nspec){ # Define priors for phi and p parameters
+      for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+         phi[s,a] ~ dunif(0,1)
+      }
+      p[s] ~ dunif(0, 1)
+    
+      # Mixture model for survival and recapture of individuals with age class 3
+      # This is the critical new stuff: survival of age-class 3 is a weighted
+      # average of juvenile and adult survival, where omega is the weight:
+      # the estimated proportion of juveniles
+      phi[s,3] <- omega[s] * phi[s,1] + (1-omega[s]) * phi[s,2] # weighted average
+      omega[s] ~ dunif(0,1)   # Priors for the proportion of juveniles
+   }
+    
+   # Likelihood for both subsets of data at once (i.e., for the single data set)
+   for(s in 1:nspec){           # Loop over species
+      for(i in 1:nind[s]){       # Loop over individuals (nind varies by species)
+         # Define latent state at first capture
+         z[i,f[i,s], s] <- 1
+         for(t in (f[i,s]+1):n.occ){ # Loop over occasions
+            # State process: the latent alive/dead state
+            z[i,t,s] ~ dbern(mu1[i,t,s])
+            mu1[i,t,s] <- z[i,t-1,s] * phi[s, X[i, t-1, s]]
+            # Observation process: relates true state to observed state, y = CH
+            y[i,t,s] ~ dbern(mu2[i,t,s])
+            mu2[i,t,s] <- z[i,t,s] * p[s]     # p also indexed by species
+         } #t
+      } #i
+   } #s
+    
+   # Compute average and standard deviation of species values as derived quant
+   for(a in 1:2){
+      # average.lphi[a] <- mean(logit(phi[,a]))   # Old version, should be correct
+      average.phi[a] <- mean(phi[,a])             # New version, should be correct, too, but could give different solution, due to non-linear transformation (logit)
+      sd.lphi[a] <- sd(logit(phi[,a]))
+   }
+   average.lp <- mean(logit(p[]))
+   sd.lp <- sd(logit(p[]))
+}
+",fill = TRUE)
+sink()
+
+# Get inits for JAGS
+known.state.cjs <- function(CH, sampsize){ # Function definition
+   state <- CH
+   for (i in 1:sampsize){      # note yellow is new
+      n1 <- min(which(CH[i,]==1))
+      n2 <- max(which(CH[i,]==1))
+      state[i,n1:n2] <- 1
+      state[i,n1] <- NA
+   }
+   state[state==0] <- NA
+   return(state)
+}
+
+# Initial values for CJS1 model for JAGS for both data subsets
+zst <- CH
+for(s in 1:nspec){
+  zst[,,s] <- known.state.cjs(CH[,,s], sampsize[s])
+}
+
+
+# NEW inits function for JAGS
+inits <- function(){list(z = zst, phi = matrix(c(runif(2*nspec), rep(NA, nspec)), nrow = nspec), p = runif(nspec), omega = runif(nspec))}
+						#phi cria uma matrix 2 primeiros elementos (juv e adulto) coloca valores de phi, 
+						#no terceiro de idade desconhecida preenche de NA, nrow é para fazer isso com todas sp
+
+# Parameters and hyperparameters monitored
+params <- c("phi", "p", "omega","average.lphi","average.lp","sd.lphi","sd.lp")
+
+# MCMC settings
+#ni <- 500000   ;   nt <- 4   ;   nb <- 100000   ;   nc <- 3 # very serious setting
+#ni <- 50000   ;   nt <- 5   ;   nb <- 5000   ;   nc <- 3 # serious setting
+#ni <- 15000   ;   nt <- 2   ;   nb <- 5000   ;   nc <- 3  # quite serious settings
+#ni <- 5000   ;   nt <- 2   ;   nb <- 1000   ;   nc <- 3  # medium serious settings
+ni <- 50   ;   nt <- 2   ;   nb <- 10   ;   nc <- 3  # test settings
+
+# Call JAGS from R
+outM3 <- jags(bugs.data, inits, params, "cjs8X.txt", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, parallel = T)
+print(outM3, 3)
+
+
+# Plot of the posterior distribution of the two means of juvenile and adult survival
+par(mfrow = c(3,1))
+hist(plogis(outM3$sims.list$average.lphi[,1]), breaks = 100, col = 'red', main = "Average juvenile survival in fixed effects model of 40 species", xlim = c(0,1))
+hist(plogis(outM3$sims.list$average.lphi[,2]), breaks = 100, col = 'blue', main = "Average adult survival in fixed effects model of 40 species", xlim = c(0,1))
+difference <- plogis(outM3$sims.list$average.lphi[,2]) - plogis(outM3$sims.list$average.lphi[,1])
+hist(difference, breaks = 100, col = 'gray', main = "Difference between mean adult and mean juvenile survival", xlim = c(-0.5, 0.5))
+abline(v = mean(difference), col = "black", lwd = 3)
+abline(v = quantile(difference, probs = c(0.025, 0.975)), col = "black", lwd = 3,lty = "dashed")
+
+
+
+# Plot posterior distributions for phi and p for fun
+par(mfrow = c(3, 3))
+for(s in 1:nspec){
+  hist(outM3$sims.list$phi[,s,1], breaks = 100, col = "gold", main = paste('phi(juv) of', spsl[s]))
+  hist(outM3$sims.list$phi[,s,2], breaks = 100, col = "gold", main = paste('phi(ad) of', spsl[s]))
+  hist(outM3$sims.list$p[,s], breaks = 100, col = "gold", main = paste('p of', spsl[s]))
+  browser()
+}
+
+############################## PLOTS FOR DATA SET OF 40 SPECIES##################################
+# Plot juvenile and adult survival for all 40 species
+# shorter names of species like this: shortname <- c("P. albifrons", "...")
+
+shortnames <- c("T.murinus","T.ardesiacus","T.caesius","E.gutturalis",
+                "M.axillaris","M.longipennis","M.menetriesii","H.cantator",
+                "P.rufifrons","M.ferruginea","P.albifrons","G.rufigula","W. poecilinotus","C.aurita","F.colma","C.stictolaemus","D.merula","D.fuliginosa",
+                "G.spirurus","X.pardalotus","X.minutus","P.erythrocercum","A. ochrolaemus","A.infuscatus","M.macconnelli","P.saturatus","P.coronatus","M.barbatus","A.spadiceus","C.gutturalis","L.serena","M.manacus","D.pipra","C.erythrocephala","P.coraya","C.arada","M.collaris","T.albicollis","T.surinamus",
+                "C.cyanoides")
+
+par(mar = c(12,5,2,2))
+plot(1:40-0.1, outM3$summary[1:40,1], pch = 1, main = "Juv. (open, red) and ad survival (closed, blue) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'phi', axes = F, col = 'red')
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8) 
+axis(2, las = 1)
+segments(1:40-0.1, outM3$summary[1:40,3], 1:40-0.1, outM3$summary[1:40,7], col = 'red')
+points(1:40+0.1, outM3$summary[41:80,1], pch = 16, col = 'blue')
+segments(1:40+0.1, outM3$summary[41:80,3], 1:40+0.1, outM3$summary[41:80,7], col = 'blue')
+
+
+# Plot recapture rate for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM3$summary[121:160,1], pch = 16, main = "Recapture for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM3$summary[121:160,3], 1:40, outM3$summary[121:160,7])
+abline(h=outM3$mean$mean.p, lty = 'solid')
+
+
+# Plot average age ratio (proportion juveniles omega) for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM3$summary[161:200,1], pch = 16, main = "Age ratio (proportion juveniles in unknown-age birds) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM3$summary[161:200,3], 1:40, outM3$summary[161:200,7])
+
+########################## Model 4 para apenas 1 sp 
+
+
+## New sample sizes (number of individuals da sp11)
+  sampsize1 <- sum(!is.na(CH[,1,11]))
+
+#mostra onde foi a primeira captura
+  fmat1 <- apply(CH[,,11], 1, function(x) min(which(x!=0)))
+fmat1[fmat1 == 'Inf'] <- NA   #se for dar infinito da NA
+
+
+3) Model phi(species*age{fixed}), p(species{fixed}) and with time-constant age ratio
+
+# Bundle data for JAGS
+str(bugs.data <- list(y = CH[,,11],  #
+			X = X[,,11], 	# n ind d diferentes idades
+			f = fmat1, 	#
+			nind = sampsize1, 	#n individuos por sampsize
+			n.occ = dim(CH)[2] #n d lugares ocupados
+			))		
+
+# Specify hierarchical CJS model in BUGS language: cjsMod3
+# This model integrates all the data
+sink("cjsMod4.txt")
+cat("
+model {
+    
+   # Priors
+   # In contrast to the previous models, we now do NOT specify hyperparameters
+    # Define priors for phi and p parameters
+      for(a in 1:2){             # Loop over ages (1 = juv, 2 = ad)
+         phi[a] ~ dunif(0,1)
+      }
+      p ~ dunif(0, 1)
+    
+      # Mixture model for survival and recapture of individuals with age class 3
+      # This is the critical new stuff: survival of age-class 3 is a weighted
+      # average of juvenile and adult survival, where omega is the weight:
+      # the estimated proportion of juveniles
+      phi[3] <- omega * phi[1] + (1-omega) * phi[2] # weighted average
+      omega ~ dunif(0,1)   # Priors for the proportion of juveniles
+ 
+    
+   # Likelihood for both subsets of data at once (i.e., for the single data set)
+   
+      for(i in 1:nind){       # Loop over individuals
+         # Define latent state at first capture
+         z[i,f[i]] <- 1
+         for(t in (f[i]+1):n.occ){ # Loop over occasions
+            # State process: the latent alive/dead state
+            z[i,t] ~ dbern(mu1[i,t])
+            mu1[i,t] <- z[i,t-1] * phi[X[i, t-1]]
+            # Observation process: relates true state to observed state, y = CH
+            y[i,t] ~ dbern(mu2[i,t])
+            mu2[i,t] <- z[i,t] * p     # p also indexed by species
+         } #t
+      } #i
+ 
+    
+   
+}
+",fill = TRUE)
+sink()
+
+# Get inits for JAGS
+known.state.cjs <- function(CH, sampsize1){ # Function definition
+   state <- CH
+   for (i in 1:sampsize1){      # note yellow is new
+      n1 <- min(which(CH[i,]==1))
+      n2 <- max(which(CH[i,]==1))
+      state[i,n1:n2] <- 1
+      state[i,n1] <- NA
+   }
+   state[state==0] <- NA
+   return(state)
+}
+
+# Initial values for CJS1 model for JAGS for both data subsets
+zst <- CH[,,11]
+  zst[,] <- known.state.cjs(CH[,,11], sampsize1)
+
+
+# NEW inits function for JAGS
+inits <- function(){list(z = zst, phi = c(runif(2), NA), p = runif(1), omega = runif(1))}
+
+# Parameters and hyperparameters monitored
+params <- c("phi", "p", "omega")
+
+# MCMC settings
+#ni <- 500000   ;   nt <- 4   ;   nb <- 100000   ;   nc <- 3 # very serious setting
+#ni <- 50000   ;   nt <- 5   ;   nb <- 5000   ;   nc <- 3 # serious setting
+#ni <- 15000   ;   nt <- 2   ;   nb <- 5000   ;   nc <- 3  # quite serious settings
+#ni <- 5000   ;   nt <- 2   ;   nb <- 1000   ;   nc <- 3  # medium serious settings
+ni <- 50   ;   nt <- 2   ;   nb <- 10   ;   nc <- 3  # test settings
+
+# Call JAGS from R
+outM4 <- jags(bugs.data, inits, params, "cjsMod4.txt", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, parallel = T)
+print(outM4, 3)
+
+
+# Plot of the posterior distribution of the two means of juvenile and adult survival
+par(mfrow = c(3,1))
+hist(plogis(outM3$sims.list$average.lphi[,1]), breaks = 100, col = 'red', main = "Average juvenile survival in fixed effects model of 40 species", xlim = c(0,1))
+hist(plogis(outM3$sims.list$average.lphi[,2]), breaks = 100, col = 'blue', main = "Average adult survival in fixed effects model of 40 species", xlim = c(0,1))
+difference <- plogis(outM3$sims.list$average.lphi[,2]) - plogis(outM3$sims.list$average.lphi[,1])
+hist(difference, breaks = 100, col = 'gray', main = "Difference between mean adult and mean juvenile survival", xlim = c(-0.5, 0.5))
+abline(v = mean(difference), col = "black", lwd = 3)
+abline(v = quantile(difference, probs = c(0.025, 0.975)), col = "black", lwd = 3,lty = "dashed")
+
+
+
+# Plot posterior distributions for phi and p for fun
+par(mfrow = c(3, 3))
+for(s in 1:nspec){
+  hist(outM3$sims.list$phi[,s,1], breaks = 100, col = "gold", main = paste('phi(juv) of', spsl[s]))
+  hist(outM3$sims.list$phi[,s,2], breaks = 100, col = "gold", main = paste('phi(ad) of', spsl[s]))
+  hist(outM3$sims.list$p[,s], breaks = 100, col = "gold", main = paste('p of', spsl[s]))
+  browser()
+}
+
+############################## PLOTS FOR DATA SET OF 40 SPECIES##################################
+# Plot juvenile and adult survival for all 40 species
+# shorter names of species like this: shortname <- c("P. albifrons", "...")
+
+shortnames <- c("T.murinus","T.ardesiacus","T.caesius","E.gutturalis",
+                "M.axillaris","M.longipennis","M.menetriesii","H.cantator",
+                "P.rufifrons","M.ferruginea","P.albifrons","G.rufigula","W. poecilinotus","C.aurita","F.colma","C.stictolaemus","D.merula","D.fuliginosa",
+                "G.spirurus","X.pardalotus","X.minutus","P.erythrocercum","A. ochrolaemus","A.infuscatus","M.macconnelli","P.saturatus","P.coronatus","M.barbatus","A.spadiceus","C.gutturalis","L.serena","M.manacus","D.pipra","C.erythrocephala","P.coraya","C.arada","M.collaris","T.albicollis","T.surinamus",
+                "C.cyanoides")
+
+par(mar = c(12,5,2,2))
+plot(1:40-0.1, outM3$summary[1:40,1], pch = 1, main = "Juv. (open, red) and ad survival (closed, blue) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'phi', axes = F, col = 'red')
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8) 
+axis(2, las = 1)
+segments(1:40-0.1, outM3$summary[1:40,3], 1:40-0.1, outM3$summary[1:40,7], col = 'red')
+points(1:40+0.1, outM3$summary[41:80,1], pch = 16, col = 'blue')
+segments(1:40+0.1, outM3$summary[41:80,3], 1:40+0.1, outM3$summary[41:80,7], col = 'blue')
+
+
+# Plot recapture rate for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM3$summary[121:160,1], pch = 16, main = "Recapture for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+segments(1:40, outM3$summary[121:160,3], 1:40, outM3$summary[121:160,7])
+abline(h=outM3$mean$mean.p, lty = 'solid')
+
+
+# Plot average age ratio (proportion juveniles omega) for all 40 species
+par(mar = c(12,5,2,2))
+plot(1:40, outM3$summary[161:200,1], pch = 16, main = "Age ratio (proportion juveniles in unknown-age birds) for all 40 species (with 95% CRI)", ylim = c(0,1), las = 1, xlab= '', ylab = 'p', axes = F)
+axis(1, 1:40, labels = shortnames, las = 2, cex = 0.8)
+axis(2, las = 1)
+
+
