@@ -1,0 +1,225 @@
+
+##################
+# GLM 23-05-2019
+#
+
+polen=read.table("viabilidade.txt", header=T)
+attach(polen)
+summary(polen)
+mean=tapply(porcentagem,dia,mean)
+sd=tapply(porcentagem,dia,sd)
+se=tapply(porcentagem,dia,mean)/sqrt(length(tapply(porcentagem,dia,sd)))
+
+install.packages("car")
+install.packages("lme4")
+library(car) 	#para Anova
+library(lme4) 	#para GLM
+modelo5<-glm(porcentagem~dia, data=polen, family=gaussian())
+modnul5<-glm(porcentagem~1, family=gaussian())#modelo nulo só para poder comparar, mas nao precisa p glm
+
+anova(modelo5, modnul5, test="F")#anova para comparar os 2 modelos e ver a dif
+#com minuscula é do glm
+Anova(modelo5) #com maiusculo é a função Anova real, usa test d chi-quadrado
+Anova(modelo5, test="F") #teste de fisher
+summary(modelo5) #modelo glm, teste tem o mesmo resultado da Anova
+pairwise.t.test(porcentagem, dia, p.adjust="none", pool.sd=T) #post-hoc entre dias
+
+modelo6<-lm(porcentagem~dia) #lm=modelo linear= uma anova ou regressao
+summary(modelo6)
+residuos<- rstandard(modelo6)
+valores.ajust<-fitted(modelo6)
+plot(valores.ajust, residuos)
+qqnorm(residuos)
+qqline(residuos)
+
+shapiro.test(porcentagem) #baixo:rejeita hipot nula,entao dados sao nao-normais
+histograma<-hist(porcentagem)
+x=seq(min(porcentagem), max(porcentagem))
+dist=dnorm(x,mean=mean(porcentagem),sd=sd(porcentagem))
+y=dist*diff(histograma$mids[1:2])*length(porcentagem)
+lines(x,y,col="red", lwd=2) #poisson
+
+modelo7<-glm(porcentagem~dia, family=poisson()) #usando poisson, roda mas descondidera dados das casas decimais
+#ao inves de porcentagem ele reconheceria o N ao inves da porcentagem
+modelo7<-glm(porcentagem~dia, family=quasipoisson())
+modnul7<-glm(porcentagem~1, family=quasipoisson())
+anova(modelo7,modnul7,test="Chisq") #p mais signif, explica melhor do q o modelo anterior q usava dist normal
+summary(modelo7)
+pairwise.t.test(porcentagem, dia, p.adjust="none", pool.sd=T)
+
+boxplot(porcentagem~dia, data=polen, las=1, #numeros ficam em pé e nao padrao deitados no graf
+cex.lab=1.5,xalb="Floral longeity(d)", ylab="Non viable pollen grains(%)")
+
+###################
+# GLMM 28-05-2019
+#
+library(lme4)	#p GLM
+library(car) 	#para Anova
+#sp (fixed)
+#plant within sp(random)
+#pollen (normal)
+dados.pr=read.table("Pollen removal.txt", header=T)
+attach(dados.pr) #anexa dados para nao precisar ficar chamando ele
+
+mnpr=lmer(Pollen~1+(1|Plant)+(1|Species)) #lmer p dist linear normal, por isso nao precisa especificar familia
+mpr=lmer(Pollen~Species+(1|Plant)+(1|Species))
+anova(mnpr,mpr,test="F") #modelo completo signif diferente d modelo nulo, valido
+#agora é q veremos resultado do nosso modelo
+
+summary(mpr)	
+#variance +- stdDev: dado para tabela-> mostra quanto nosso dado varia
+# estimate +- SE: estimate>SE=signif. se negativo:valores sp2 menores q sp1
+Anova(mpr)	#Chisq: valor do teste
+
+#agora c variaveis categoricas
+dados.ro=read.table("Reproductive output.txt", header=T)
+attach(dados.ro)
+n.fruto=glmer(Fruto~1+(1|Fruto)+(1|Species),family=binomial) #glmer p binomial e poisson
+m.fruto=glmer(Fruto~Species+(1|Fruto)+(1|Species),family=binomial)
+
+anova(n.fruto,m.fruto,test="Chisq")
+summary(m.fruto)	#para dist binomial test = z, do summary
+#se usamos AIC e assumimos dist normal = precisamos usar anova e ir comparando diversas combinações
+#se usamos AIC e dist binomial/poisson = obtemos resultado no summary
+#no lugar de AIC= fazemos um resumo de todos de modelos com Anova q mostra Chisq
+#Anova = nao compara todas as categorias, nao divide A por B, é um resumo
+
+library(MASS)
+
+#sp (fixo), tratam(fico), sp*tratam(fixo)
+#plant within sp(random), seed number(poisson)
+#nulseed=glmmPQL(SEED~1,random=1|Plant,family=quasipoisson(link=log)) 
+mseed=glmmPQL(SEED~POPULATION*TREATMENT,random=list(Plant=~1),family=binomial(link=log))
+#dessa vez nao usamos AIC por isso nao fizemos anova comparando modelo com nulo
+Anova(mseed)
+summary(mseed)
+
+library(lsmeans)
+lsmeans(mtotalseeds,list(pairwise~Species*Tratamiento),adjust="tukey")
+#post-hoc: compara tudo com tudo
+
+
+################ MEU GLM
+
+gldata <- read.table(file = "clipboard", sep = "\t", header=TRUE)
+str(gldata)
+
+library(lme4)	#p GLM
+library(car) 	#para Anova
+
+modelo5<-glm(prego~urbana+Caat.aberta*Caat.densa+Cana+Pec.seca+Past.umida+Peq.agricultura+
+	Forest.cover+Mata.at, data=gldata, family=binomial())
+summary(modelo5) #melhor qnn deviance esta perto dos graus d liberdade (tanto p mais quanto p menos)
+#urbana+Caat.aberta+Cana+Pec.seca+Past.umida+Peq.agricultura+
+#Forest.cover+Caat.densa+Mata.at+B+zona+queca+queco (fixed)
+#entrevist within local (random)-> =perguntas p pessoas diferentes
+#só aninharia se fosse respostas diferentes para mesma pessoa
+#prego (binomial)
+
+#Species (fixed)
+#Plant within species (random)
+#Fruto (binomial)
+
+m.n.prego = glmer(prego~1+(1|entrevist)+(1|local),family=binomial)
+
+m.fruto = glmer(Fruto~Species+(1|Planta)+(1|Species),family=binomial) 
+anova(m.n.fruto,m.fruto,test="Chisq")
+summary(m.fruto)
+
+
+ Artigo Teixido & Aizen 2019. Annals of Botany:
+
+ ##Seed production
+
+seeds= read.table("seed production.txt",header=T)
+attach(seeds)
+summary(seeds)
+library(MASS)
+
+#Population (fixed)
+#Treatment (fixed)
+#Population x treatment (fixed)
+#Plant within population (random)
+#Seed production (Poisson)
+
+nulcaatinga = glmmPQL(prego ~ 1, random = ~ 1|fragm,family=quasipoisson(link = log))
+mcaatinga = glmmPQL(prego ~veg+areaKm2+par+isol+urbd+agrd+pecd+popq+queca+queco , random = list (fragm = ~1), family=quasipoisson(link = log))
+summary(mcaatinga)  
+Anova(mcaatinga)
+library(lsmeans)
+lsmeans(mcaatinga, list(pairwise ~ POPULATION*TREATMENT), adjust = "tukey")
+
+library(glmm)
+help(glmm)
+
+data(datac)
+set.seed(1234) #fixa uma ordem, se não, cada resultado sera diferente
+
+mod.mcml1<-glmm(datac$prego~Dec+veg+areaKm2+par+isol+urbd+agrd+pecd+popq+queca+queco,
+list(prego~local),varcomps.names=c("local"),data=datac,
+family.glmm=poisson.glmm,m=10,doPQL=TRUE)
+#list: onde inserimos o efeito aleatorio (para bernoulli, q dados são 0 ou 1 
+##fica y~0+z1 variav y agrupada pela variav z1(aleatoria)iniciando no 0, na 
+##variavel contínua retira esse zero pois sera calculado automaticamente
+#m= repetições de montecarlo
+#efeito aleatorio = oq não queremos investigar mas estamos considerando (ex diferença d terreno, folhas do mesmo individuo...)
+
+mod.mcml1$beta
+mod.mcml1$nu
+summary(mod.mcml1)
+coef(mod.mcml1) 
+
+
+############## TESTE G
+## (2) G-TEST POR BIOMAS Y GRUPOS
+
+install.packages("DescTools")
+library(DescTools)
+
+bi = read.table("Biomes.txt",header=T)
+attach(bi)
+summary(bi)
+GTest(bi[1:2])
+
+am = read.table("amazon.txt",header=T)
+attach(am)
+summary(am)
+GTest(am)
+
+af = read.table("atlantic.txt",header=T)
+attach(af)
+summary(af)
+GTest(af)
+
+caat = read.table("caatinga.txt",header=T)
+attach(caat)
+summary(caat)
+GTest(caat)
+
+cer = read.table("cerrado.txt",header=T)
+attach(cer)
+summary(cer)
+GTest(cer)
+
+pam = read.table("pampa.txt",header=T)
+attach(pam)
+summary(pam)
+GTest(pam)
+
+pan = read.table("pantanal.txt",header=T)
+attach(pan)
+summary(pan)
+GTest(pan)
+
+  ##Test t pareado para controle x tratamento 1 (flores de 1 dia)
+
+dados.par= read.table("Test pareado T1.txt",header=T)
+attach(dados.par)
+summary(dados.par)
+var.test(VISITAS_C,VISITAS_T1) #da variação entre 2 variaveis, se elas estao covariando
+shapiro.test(VISITAS_C) #teste de homocedasticidade
+shapiro.test(VISITAS_T1) #signif=nao-normal
+t.test(VISITAS_C,VISITAS_T1,"two.sided",paired=TRUE)
+wilcox.test(VISITAS_C,VISITAS_T1,alternative = "two.sided", mu = 0, paired = TRUE)
+install.packages("coin")
+library(coin)
