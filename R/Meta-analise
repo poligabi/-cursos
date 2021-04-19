@@ -1,0 +1,141 @@
+
+
+library(metafor)
+?escalc #p tamanhos do efeito
+?rma #p meta-analise
+
+ex1<-read.table("ex1.txt",head=T)
+#exemplo de Numero, Medias e DeSvio-padrao: Experim e Controle
+
+dat.ex1<-escalc(measure="SMD",
+                  m1i=ME, sd1i=SDE, n1i=NE, 
+                  m2i=MC, sd2i=SDC, n2i=NC,
+                  vtype="UB",data=ex1, 
+                  append=TRUE)
+
+dat.ex1 #yi=tamanho do efeito; vi=variancia
+
+w<-1/dat.ex1$vi 		#peso=1/variancia
+w
+
+###### Efeito fixo
+res.fe1<-rma(yi, vi, data=dat.ex1, method="FE")#FE=fixed effect
+res.fe1
+#I2 = hetereogeneidade dos resultados, porcent variabilidade potenciamente explicada (alto:Bom)
+#H2 = 
+#Q = teste de signif: se ha heterogeneidade entre tamanho dos efeitos
+#se ha heterogeneidade no Q indica uso de analise de efeito aleatoria
+#estimate= M; se=SE; z=M/se (se theta=0)
+
+forest(res.fe1)
+
+##### vies de publicacao
+
+funnel(res.fe1, yaxis="sei") #ylab=dizer q o exio esta invertido, zero no topo
+#se nao existit vies, os estudos estariam dentro da area do funil
+
+#fail safe number
+fsn(yi, vi, data=dat.ex1,type="Orwin",target=-0.06) 
+#N= quantos artigos seriam necessarios p tamnho do efeito observado ser não importante
+#average= valor encontrado(-0.12)
+#target= estimamos q não seria importante (default:50%,metade do encontrado) 
+
+
+fsn(yi, vi, data=dat.ex1,type="Orwin",target=-0.10)
+#se coloca um target +proximo do observado(-0.12), diminui N artigos necessario
+
+#quanto menor esse numero, menos robusta a analise, pq bastava esse pouco para ja mudar
+#se precisa de muitos artigos para conseguir mudar, pq a analise é muito robusta, forte
+
+rtf<-trimfill(res.fe1)
+rtf 		#add estudos simetricos
+funnel(rtf)
+
+##### Efeito Aleatorio
+
+res.re1<-rma(yi, vi, data=dat.ex1, method="DL")
+res.re1
+#Tau2= usa os pesos pra estimar heterogeneidade dos estudos
+#Tau=
+#I2= igual ao efeito fixo, nao incorporou heterogeneidade
+#Q= igual efeito fixo tbm
+# estimate=M; nao signif ->a heterogeneidade é causada pela variacao dos estudos
+
+forest(res.re1)
+
+
+###### se so tem r de pearson (nao ha medias)
+#-> use z de Fisher
+
+ex6<-read.table("ex6.txt", header=TRUE)
+
+dat.ex6<-escalc(measure="ZCOR", 
+                ri=r, ni=n, data=ex6, append=TRUE)
+#desconsidera estudos com N muito baixo
+
+res.fe6<-rma(yi, vi, data=dat.ex6,method="FE") #modelo fixo
+res.fe6
+#heterogeneidade muito alta
+
+res.re6<-rma(yi, vi, data=dat.ex6,method="DL") #modelo aleatorio
+res.re6
+# não signif
+
+
+
+#### Analise de Sub-grupos
+
+cap19<-read.table("cap19.txt", head=T)
+
+res.cap19<-rma(Y, V, method="FE",data=cap19)
+res.cap19
+
+res.cap19A<-rma(Y, V, subset = (G=="A"), 
+                method="FE",data=cap19)
+res.cap19A
+
+res.cap19B<-rma(Y, V, subset = (G=="B"), 
+                method="FE",data=cap19)
+res.cap19B
+
+res.cap19AB<-rma(Y, V, mods=~factor(G)-1,  #no lugar de subset retirou o intercept
+                 method="FE",data=cap19)
+res.cap19AB
+
+res.cap19Mod<-rma(Y, V, mods=~factor(G),
+                  method="FE",data=cap19)
+res.cap19Mod
+
+
+
+##### Sub-grupo p efeito aleatorio
+
+res.cap19DL<-rma(Y, V, method="DL", data=cap19)
+res.cap19DL
+res.cap19DLAB<-rma(Y, V, mods=~factor(G)-1,
+                   method="DL", data=cap19)
+res.cap19DLAB
+
+res.cap19.DLMod<-rma(Y, V, mods=~factor(G), 
+                     method="DL", data=cap19) 
+res.cap19.DLMod
+
+
+#### Forest plot por grupo
+# http://www.metafor-project.org/doku.php/plots:forest_plot_with_subgroups
+
+
+
+
+#####  Meta-regressao
+
+ex4<-read.table("ex4.txt", head=T)
+
+#tudo igual so que o moderador é variavel quantitativa
+
+
+
+ex5<-read.table("ex5.txt", head=T)
+
+
+
