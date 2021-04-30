@@ -4,6 +4,15 @@ library(metafor)
 ?escalc #p tamanhos do efeito
 ?rma #p meta-analise
 
+mdata<-read.table(file = "clipboard", sep = "\t", header=TRUE)
+pdata<- subset(mdata, mdata$Variavel == "patchsize")
+dat.ex1<-escalc(measure="SMD",
+                  m1i=m.pres, sd1i=sd.pres, n1i=n.pres, 
+                  m2i=m.aus, sd2i=sd.aus, n2i=n.aus,
+                  vtype="UB",data=pdata, 
+                  append=TRUE, slab= Citation)
+
+
 ex1<-read.table("ex1.txt",head=T)
 #exemplo de Numero, Medias e DeSvio-padrao: Experim e Controle
 
@@ -27,15 +36,42 @@ res.fe1
 #se ha heterogeneidade no Q indica uso de analise de efeito aleatoria
 #estimate= M; se=SE; z=M/se (se theta=0)
 
-forest(res.fe1)
+forest(res.fe1,
+	#atransf=exp, #no lugar dos resultados SMD aparece Risk 
+	at=log(c(.05, .25, 1, 4)), 
+	#cex=.75, #tamanho da fonte
+	header="Author(s) and Year - Variable:Patch Size",
+       mlab="")
 
-##### vies de publicacao
+dat <- dat.bcg
+ 
+### calculate log risk ratios and corresponding sampling variances (and use
+### the 'slab' argument to store study labels as part of the data frame)
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat,
+              slab=paste(author, year, sep=", "))
+ 			#slab = nome do estudo
+### fit random-effects model
+res <- rma(yi, vi, data=dat)
+ 
+### forest plot with extra annotations
+forest(res, 
+	atransf=exp, 
+	at=log(c(.05, .25, 1, 4)), 
+	#xlim=c(-16,6), #espaco entre o cabecalho e forest
+	#ilab=cbind(dat.bcg$tpos, dat.bcg$tneg, dat.bcg$cpos, dat.bcg$cneg), #dados extras
+      #ilab.xpos=c(-9.5,-8,-6,-4.5), 
+	cex=.75, #tamanho da fonte
+	header="Author(s) and Year",
+       mlab="")
+
+
+##### Vies de publicacao
 
 funnel(res.fe1, yaxis="sei") #ylab=dizer q o exio esta invertido, zero no topo
 #se nao existit vies, os estudos estariam dentro da area do funil
 
 #fail safe number
-fsn(yi, vi, data=dat.ex1,type="Orwin",target=-0.06) 
+fsn(yi, vi, data=dat.ex1,type="Orwin",target= -0.06) 
 #N= quantos artigos seriam necessarios p tamnho do efeito observado ser não importante
 #average= valor encontrado(-0.12)
 #target= estimamos q não seria importante (default:50%,metade do encontrado) 
@@ -51,6 +87,9 @@ rtf<-trimfill(res.fe1)
 rtf 		#add estudos simetricos
 funnel(rtf)
 
+
+
+
 ##### Efeito Aleatorio
 
 res.re1<-rma(yi, vi, data=dat.ex1, method="DL")
@@ -62,6 +101,10 @@ res.re1
 # estimate=M; nao signif ->a heterogeneidade é causada pela variacao dos estudos
 
 forest(res.re1)
+
+
+
+
 
 
 ###### se so tem r de pearson (nao ha medias)
@@ -80,6 +123,8 @@ res.fe6
 res.re6<-rma(yi, vi, data=dat.ex6,method="DL") #modelo aleatorio
 res.re6
 # não signif
+
+
 
 
 
@@ -108,6 +153,8 @@ res.cap19Mod
 
 
 
+
+
 ##### Sub-grupo p efeito aleatorio
 
 res.cap19DL<-rma(Y, V, method="DL", data=cap19)
@@ -121,8 +168,88 @@ res.cap19.DLMod<-rma(Y, V, mods=~factor(G),
 res.cap19.DLMod
 
 
+
+
 #### Forest plot por grupo
 # http://www.metafor-project.org/doku.php/plots:forest_plot_with_subgroups
+
+### copy BCG vaccine meta-analysis data into 'dat'
+dat <- dat.bcg
+ 
+### calculate log risk ratios and corresponding sampling variances (and use
+### the 'slab' argument to store study labels as part of the data frame)
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat,
+              slab=paste(author, year, sep=", "))
+ 
+### fit random-effects model
+res <- rma(yi, vi, data=dat)
+ 
+### set up forest plot (with 2x2 table counts added; the 'rows' argument is
+### used to specify in which rows the outcomes will be plotted)
+forest(res, xlim=c(-16, 6), at=log(c(0.05, 0.25, 1, 4)), atransf=exp,
+       ilab=cbind(dat$tpos, dat$tneg, dat$cpos, dat$cneg),
+       ilab.xpos=c(-9.5,-8,-6,-4.5), cex=0.75, ylim=c(-1, 27),
+       order=dat$alloc, rows=c(3:4,9:15,20:23),
+       xlab="Risk Ratio", mlab="", psize=1, header="Author(s) and Year")
+ 
+### add text with Q-value, dfs, p-value, and I^2 statistic
+text(-16, -1, pos=4, cex=0.75, bquote(paste("RE Model for All Studies (Q = ",
+     .(formatC(res$QE, digits=2, format="f")), ", df = ", .(res$k - res$p),
+     ", p = ", .(formatC(res$QEp, digits=2, format="f")), "; ", I^2, " = ",
+     .(formatC(res$I2, digits=1, format="f")), "%)")))
+ 
+### fit meta-regression model to test for subgroup differences
+res <- rma(yi, vi, mods = ~ alloc, data=dat)
+ 
+### add text for the test of subgroup differences
+text(-16, -1.8, pos=4, cex=0.75, bquote(paste("Test for Subgroup Differences: ",
+     Q[M], " = ", .(formatC(res$QM, digits=2, format="f")), ", df = ", .(res$p - 1),
+     ", p = ", .(formatC(res$QMp, digits=2, format="f")))))
+ 
+### set font expansion factor (as in forest() above) and use bold italic
+### font and save original settings in object 'op'
+op <- par(cex=0.75, font=4)
+ 
+### add text for the subgroups
+text(-16, c(24,16,5), pos=4, c("Systematic Allocation",
+                               "Random Allocation",
+                               "Alternate Allocation"))
+ 
+### switch to bold font
+par(font=2)
+ 
+### add column headings to the plot
+text(c(-9.5,-8,-6,-4.5), 26, c("TB+", "TB-", "TB+", "TB-"))
+text(c(-8.75,-5.25),     27, c("Vaccinated", "Control"))
+ 
+### set par back to the original settings
+par(op)
+ 
+### fit random-effects model in the three subgroups
+res.s <- rma(yi, vi, subset=(alloc=="systematic"), data=dat)
+res.r <- rma(yi, vi, subset=(alloc=="random"), data=dat)
+res.a <- rma(yi, vi, subset=(alloc=="alternate"), data=dat)
+ 
+### add summary polygons for the three subgroups
+addpoly(res.s, row=18.5, cex=0.75, atransf=exp, mlab="")
+addpoly(res.r, row= 7.5, cex=0.75, atransf=exp, mlab="")
+addpoly(res.a, row= 1.5, cex=0.75, atransf=exp, mlab="")
+ 
+### add text with Q-value, dfs, p-value, and I^2 statistic for subgroups
+text(-16, 18.5, pos=4, cex=0.75, bquote(paste("RE Model for Subgroup (Q = ",
+     .(formatC(res.s$QE, digits=2, format="f")), ", df = ", .(res.s$k - res.s$p),
+     ", p = ", .(formatC(res.s$QEp, digits=2, format="f")), "; ", I^2, " = ",
+     .(formatC(res.s$I2, digits=1, format="f")), "%)")))
+text(-16, 7.5, pos=4, cex=0.75, bquote(paste("RE Model for Subgroup (Q = ",
+     .(formatC(res.r$QE, digits=2, format="f")), ", df = ", .(res.r$k - res.r$p),
+     ", p = ", .(formatC(res.r$QEp, digits=2, format="f")), "; ", I^2, " = ",
+     .(formatC(res.r$I2, digits=1, format="f")), "%)")))
+text(-16, 1.5, pos=4, cex=0.75, bquote(paste("RE Model for Subgroup (Q = ",
+     .(formatC(res.a$QE, digits=2, format="f")), ", df = ", .(res.a$k - res.a$p),
+     ", p = ", .(formatC(res.a$QEp, digits=2, format="f")), "; ", I^2, " = ",
+     .(formatC(res.a$I2, digits=1, format="f")), "%)")))
+
+
 
 
 
